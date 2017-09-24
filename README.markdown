@@ -26,17 +26,34 @@ Below are a couple of simple examples of what the parser outputs:
 
 `0 2 4 6` => `[ 0, 2, 4, 6, type: 'pattern' ]`
 
-`0 [2 3] 4(3,8) 7*2` =>
+`0 [[2 3] [2 4(3,8) 7*2]] 5` =>
 
 ```js
-[ 
-  0,
-  [ 2, 3, type: 'polyrhythm' ],
-  { type: 'euclid', value: 4, pulses: 3, slots: 8 },
-  { type: 'binop', left: 7, op: '*', right: 2 },
-
-  type: 'pattern' 
+[
+  0, 
+  [
+    [2, 3, type:'polyrhythm'],
+    [
+      2, 
+      {
+        "type": "euclid",
+        "value": 4,
+        "pulses": 3,
+        "slots": 8
+      }, 
+      {
+        "type": "binop",
+        "left": 7,
+        "op": "*",
+        "right": 2
+      },
+      type:'polyrhythm'
+    ],
+    type:'polyrhythm'
+  ], 
+  5
 ]
+
 ```
 
 ## Development
