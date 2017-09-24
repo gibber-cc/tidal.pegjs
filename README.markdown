@@ -21,6 +21,24 @@ By default the file exports a global named `Tidal` that has a `parse` method for
 
 If you'd like to use JS modules of some type instead of a global, see the development section.
 
+## Parsing
+Below are a couple of simple examples of what the parser outputs:
+
+`0 2 4 6` => `[ 0, 2, 4, 6, type: 'pattern' ]`
+
+`0 [2 3] 4(3,8) 7*2` =>
+
+```js
+[ 
+  0,
+  [ 2, 3, type: 'polyrhythm' ],
+  { type: 'euclid', value: 4, pulses: 3, slots: 8 },
+  { type: 'binop', left: 7, op: '*', right: 2 },
+
+  type: 'pattern' 
+]
+```
+
 ## Development
 
 ### Installing dependencies
