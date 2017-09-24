@@ -1,0 +1,25 @@
+{
+  "name": "tidal.pegjs",
+  "version": "1.0.0",
+  "description": "A parsing expression grammar for the Tidal pattern language.",
+  "main": "tidal.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "tidal",
+    "javascript",
+    "peg",
+    "electronic",
+    "music",
+    "tidalcycles"
+  ],
+  "author": "Charlie Roberts",
+  "license": "MIT",
+  "devDependencies": {
+    "pegjs": "^0.10.0"
+  }
+}
