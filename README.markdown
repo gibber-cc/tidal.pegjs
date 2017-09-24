@@ -1,6 +1,6 @@
 # tidal.pegjs
 
-`tidal.pegjs` is a parsing expression grammar for the (TidalCycles pattern language)[https://tidalcycles.org/patterns.html], written using (PEG.js)[http://pegjs.org]. The goal of the PEG is to easily translate strings of Tidal patterns into annotated JavaScript data structures for use in sequencing.
+`tidal.pegjs` is a parsing expression grammar for the [TidalCycles pattern language](https://tidalcycles.org/patterns.html), written using [PEG.js](http://pegjs.org). The goal of the PEG is to easily translate strings of Tidal patterns into annotated JavaScript data structures for use in sequencing.
 
 ## Usage
 By default the file exports a global named `Tidal` that has a `parse` method for parsing patterns.
@@ -63,3 +63,6 @@ For more instructions on compiling parsers, see https://pegjs.org/documentation#
 Tests are done with Mocha. With Mocha installed, run `mocha` from the top-level directory to run parsing tests.
 
 Eventually I'll setup a gulpfile to run these tests automatically whenever changes to the parser / tests are made.
+
+## More about PEGs and musical programming languages
+Graham Wakefield and I ran [a workshop on using PEGs to create musical programming languages](http://worldmaking.github.io/workshop_nime_2017/); check it out for more about how PEGs work and tutorials on creating your own mini-languages.
