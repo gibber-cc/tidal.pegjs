@@ -77,9 +77,11 @@ For more instructions on compiling parsers, see https://pegjs.org/documentation#
 
 ### Testing
 
-Tests are done with Mocha. With Mocha installed, run `mocha` from the top-level directory to run parsing tests.
+Tests are done with Mocha, you'll need to have it installed globally. You should also have peg.js installed locally:
 
-Eventually I'll setup a gulpfile to run these tests automatically whenever changes to the parser / tests are made.
+`npm install pegjs`
+
+Then run `mocha` from the top-level directory to run the parsing tests. Eventually I'll setup a gulpfile to run these tests automatically whenever changes to the parser / tests are made.
 
 ## More about PEGs and musical programming languages
 Graham Wakefield and I ran [a workshop on using PEGs to create musical programming languages](http://worldmaking.github.io/workshop_nime_2017/); check it out for more about how PEGs work and tutorials on creating your own mini-languages.
