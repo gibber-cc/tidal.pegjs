@@ -51,7 +51,8 @@ Below are a couple of simple examples of what the parser outputs:
     ],
     type:'polyrhythm'
   ], 
-  5
+  5,
+  type:'pattern'
 ]
 
 ```
