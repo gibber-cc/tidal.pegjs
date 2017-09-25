@@ -14,7 +14,7 @@ By default the file exports a global named `Tidal` that has a `parse` method for
   <body></body>
   <script>
     const test = Tidal.parse( '0 1 2' )
-    console.log( test )
+    console.log( test ) // [ 0,1,2, type:'pattern' ]
   </script>
 </html>
 ```
