@@ -14,23 +14,47 @@ const parser  = peg.generate( grammar )
 describe( 'Testing polyrhyhtms and nested polyrhythms.', () => { 
 
   /*
-   * "[ 0 1 2 ]" ->
+   * "[ 0 1 2, 4 5 ]" ->
    *
    * [
-   *   [ 0,1,2, type:'polyrhythm'],
+   *   [
+   *     [ 
+   *        { type:'number', value:0 },
+   *        { type:'number', value:1 },
+   *        { type:'number', value:2 },
+   *        type:'group'
+   *     ],
+   *     [ 
+   *        { type:'number', value:3 },
+   *        { type:'number', value:4 },
+   *        type:'group'
+   *     ],
+   *     type:'polyrhythm'
+   *   ],
    *   type:'pattern'
    * ]
    *
    */
 
   it( 'Commas should return an pattern marked as a polyrhythm', () => {
-    const polyrhythm = [ 0, 1, 2 ]
+    const polyrhythm = [
+      [ 
+        { type:'number', value:0 },
+        { type:'number', value:1 },
+        { type:'number', value:2 },
+      ],
+      [ 
+        { type:'number', value:3 },
+        { type:'number', value:4 },
+      ]
+    ].map( v => { v.type = 'group'; return v })
+
     polyrhythm.type  = 'polyrhythm'
     
     const pattern = [ polyrhythm ]
     pattern.type  = 'pattern'
 
-    const result = parser.parse( '[ 0 1, 2 3 4 ]' )
+    const result = parser.parse( '[ 0 1 2, 3 4 ]' )
       
     assert.deepEqual( pattern, result )
   })
