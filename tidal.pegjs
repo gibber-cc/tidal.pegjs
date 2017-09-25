@@ -25,7 +25,7 @@ token = (number / word / list)
 // match polyrhtyhms and polymeters
 list "list" = ( "[" / "{" ) _
 body:pattern* _ delimiter:( "]" / "}" ) {
-  body.type =  delimiter === ']' ? 'polyrhythm' : 'polymeter'
+  body.type =  delimiter === ']' ? 'group' : 'polymeter'
   return body 
 }
 

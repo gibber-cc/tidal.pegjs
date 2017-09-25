@@ -32,7 +32,7 @@ Below are a couple of simple examples of what the parser outputs:
 [
   0, 
   [
-    [2, 3, type:'polyrhythm'],
+    [2, 3, type:'group'],
     [
       2, 
       {
@@ -47,9 +47,9 @@ Below are a couple of simple examples of what the parser outputs:
         "op": "*",
         "right": 2
       },
-      type:'polyrhythm'
+      type:'group'
     ],
-    type:'polyrhythm'
+    type:'group'
   ], 
   5,
   type:'pattern'
