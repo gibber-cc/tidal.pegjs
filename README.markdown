@@ -14,7 +14,16 @@ By default the file exports a global named `Tidal` that has a `parse` method for
   <body></body>
   <script>
     const test = Tidal.parse( '0 1 2' )
-    console.log( test ) // [ 0,1,2, type:'pattern' ]
+    console.log( test ) 
+    /*
+    outputs:
+     [ 
+       { type:'number', value:0 },
+       { type:'number', value:1 },
+       { type:'number', value:2 },
+       type:'pattern' 
+     ]
+    */
   </script>
 </html>
 ```
@@ -30,28 +39,30 @@ Below are a couple of simple examples of what the parser outputs:
 
 ```js
 [
-  0, 
+  { type:'number', value:0 }, 
   [
-    [2, 3, type:'group'],
+    [ 
+      { type:'number', value:2 }, { type:'number', value:3 }, type:'group' 
+    ],
     [
-      2, 
+      { type:'number', value:2 }, 
       {
         "type": "euclid",
-        "value": 4,
-        "pulses": 3,
-        "slots": 8
+        "value":  { type:'number', value:4 },
+        "pulses": { type:'number', value:3 },
+        "slots":  { type:'number', value:8 }
       }, 
       {
         "type": "binop",
-        "left": 7,
-        "op": "*",
-        "right": 2
+        "left": { type:'number', value:7 },
+        "op":   "*",
+        "right":{ type:'number', value:2 } 
       },
       type:'group'
     ],
     type:'group'
   ], 
-  5,
+  { type:'number', value:5 },
   type:'pattern'
 ]
 
