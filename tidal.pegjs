@@ -31,14 +31,18 @@ body:pattern* _ delimiter:( "]" / "}" ) {
 
 // match one or more tokens or expressions that does not 
 // contain [], {}, or + - * /
-word "word" = $[^ \[\] \{\} \(\) \t\n\r '*' '/' '+' '-']+
+word "word" = value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '+' '-']+ {
+  return { type:typeof value, value }
+}
 
 // match tidal operators
 op = '*' / '/' / '+' / '-'
 
 // match a number, with or without decimals, positive or negative
 // return value as number, not as string
-number = "-"? (([0-9]+ "." [0-9]*) / ("."? [0-9]+)) { return +text(); }
+number = "-"? (([0-9]+ "." [0-9]*) / ("."? [0-9]+)) {
+  return { type:'number', value:+text() } 
+}
 
 // match zero or more whitespaces (tabs, spaces, newlines)
 _ "whitespace" = [ \t\n\r ]*

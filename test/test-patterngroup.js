@@ -17,14 +17,23 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
    * "[ 0 1 2 ]" ->
    *
    * [
-   *   [ 0,1,2, type:'group'],
+   *   [
+   *     { type:'number', value: 0 },
+   *     { type:'number', value: 1 },
+   *     { type:'number', value: 2 },
+   *     type:'group'
+   *   ]
    *   type:'pattern'
    * ]
    *
    */
 
   it( 'Array brackets [] should return an array marked as a group.', () => {
-    const group = [ 0, 1, 2 ]
+    const group = [
+      { type:'number', value: 0 },
+      { type:'number', value: 1 },
+      { type:'number', value: 2 },
+    ]
     group.type  = 'group'
     
     const pattern = [ group ]
@@ -53,13 +62,20 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
 
   it( 'Nested brackets should return nested groups.', () => {
     const nestedGroup = [
-      [ 0, 1, 2 ],
-      [ 3, 4 ]
+      [
+        { type:'number', value:0 },
+        { type:'number', value:1 },
+        { type:'number', value:2 },
+      ],
+      [ 
+        { type:'number', value:3 }, 
+        { type:'number', value:4 } 
+      ]
     ].map( v => { v.type = 'group'; return v } )
 
     nestedGroup.type = 'group'
 
-    const pattern = [ 0, nestedGroup, 5 ]
+    const pattern = [ { type:'number', value:0 }, nestedGroup, { type:'number', value:5 } ]
     pattern.type = 'pattern'
 
     const result = parser.parse( '0 [[ 0 1 2 ] [ 3 4 ]] 5' )

@@ -16,12 +16,20 @@ describe( 'Testing simple number series patterns.', () => {
   /*
    * "0 1 2" ->
    *
-   * [ 0,1,2, type:'pattern' ]
-   *
+   * [
+   *   { type:'number', value: 0 },
+   *   { type:'number', value: 1 },
+   *   { type:'number', value: 2 },
+   *   type:'pattern'
+   * ]
    */
 
   it( '"0 1 2" should parse to an array of three numbers, marked as a pattern.', () => {
-    const answer = [ 0, 1, 2 ]
+    const answer = [
+      { type:'number', value: 0 },
+      { type:'number', value: 1 },
+      { type:'number', value: 2 },
+    ]
     answer.type  = 'pattern'
 
     const result = parser.parse( '0 1 2' )
