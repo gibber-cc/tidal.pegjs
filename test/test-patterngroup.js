@@ -83,4 +83,26 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
     assert.deepEqual( pattern, result )
   })
 
+  it( '"Marking out feet" should divide patterns into groups.', () => {
+    const groups = [ 
+      [
+        { type:'number', value:0 },
+        { type:'number', value:1 },
+        { type:'number', value:2 },
+      ],
+      [ 
+        { type:'number', value:3 }, 
+        { type:'number', value:4 } 
+      ]
+    ].map( v => { v.type = 'group'; return v } )
+
+    groups.type = 'group'
+
+    const pattern = [ groups ]
+    pattern.type = 'pattern'
+
+    const result = parser.parse( '0 1 2 . 3 4' )
+
+    assert.deepEqual( pattern, result )
+  })
 })

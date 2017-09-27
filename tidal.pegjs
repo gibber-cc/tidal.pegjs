@@ -1,9 +1,11 @@
 {
   // find a token that is a comma
-  var findComma = v => v.type === 'string' && v.value === ',' 
+  const findComma = v => v.type === 'string' && v.value === ',' 
+  const findDot   = v => v.type === 'string' && v.value === '.' 
 }
 
-series = top:pattern+ {
+series = top:(feets / pattern)+ {
+  const end = top.length > 1 ? top : top[0]
   top.type = 'pattern'
   return top
 }
@@ -25,10 +27,22 @@ euclid = value:token '(' _ pulses:token ',' _ slots:token ')' {
   return { type:'euclid', value, pulses, slots }
 }
 
-token = (number / word / list / polyrhythm)
+token = (number / word / list )
+ 
+feets = start:feet+ end:(token _)+ {
+  const __end = end.map( v => v[0] )
+  __end.type = 'group'
+  
+  start.push( __end )
+  start.type = 'group'
 
-polyrhythm = pr:(((word / number)+ comma )+ (word/number)+) {
-  console.log( pr )
+  return start
+} 
+
+feet = value:(token _)+ _ dot _ { 
+	let group = value.map( v => v[0] )
+  group.type = 'group'
+  return group
 }
 
 // match polyrhtyhms and polymeters
@@ -61,16 +75,18 @@ body:pattern* _ delimiter:( "]" / "}" ) {
   return returnValue 
 }
 
+dot = '.' { return { type:'string', value:'.' } }
+
 // match one or more tokens or expressions that does not 
 // contain [], {}, or + - * /
-word "word" = value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '+' '-']+ {
+word "word" = value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '+' '-' '.' ]+ {
   return { type:typeof value, value }
 }
 
 // match tidal operators
 op = '*' / '/' / '+' / '-'
 
-comma = ','
+comma = ',' 
 
 // match a number, with or without decimals, positive or negative
 // return value as number, not as string
@@ -80,4 +96,5 @@ number = "-"? (([0-9]+ "." [0-9]*) / ("."? [0-9]+)) {
 
 // match zero or more whitespaces (tabs, spaces, newlines)
 _ "whitespace" = [ \t\n\r ]*
+
 

@@ -11,7 +11,7 @@ const assert = require( 'assert')
 const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' }) 
 const parser  = peg.generate( grammar )
 
-describe( 'Testing polyrhyhtms and nested polyrhythms.', () => { 
+describe( 'Testing polyrhythms and nested polyrhythms.', () => { 
 
   /*
    * "[ 0 1 2, 4 5 ]" ->
@@ -36,7 +36,7 @@ describe( 'Testing polyrhyhtms and nested polyrhythms.', () => {
    *
    */
 
-  it( 'Commas should return an pattern marked as a polyrhythm', () => {
+  it( 'Commas should return a pattern marked as a polyrhythm', () => {
     const polyrhythm = [
       [ 
         { type:'number', value:0 },
