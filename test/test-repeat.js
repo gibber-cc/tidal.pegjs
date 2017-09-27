@@ -29,7 +29,7 @@ describe( 'Testing repeats.', () => {
    *
    */
 
-  it( 'should generate a 2x repeat on a number', () => {
+  it( 'should generate a 2x repeat on a number.', () => {
     const pattern = [
       { 
         type:'repeat',
@@ -66,7 +66,7 @@ describe( 'Testing repeats.', () => {
    *
    */
 
-  it( 'should generate a 2x repeat on a number', () => {
+  it( 'should generate a 2x repeat on a pattern group.', () => {
     const pattern = [
       { 
         type:'repeat',

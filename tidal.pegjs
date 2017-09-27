@@ -15,7 +15,7 @@ series = top:(feet / pattern)+ {
 
 // favor matching top-level lists and other data structures
 // over words (left to right precedence)
-pattern "pattern" = body:( repeat / euclid / token ) _ { 
+pattern "pattern" = body:( degrade / repeat / euclid / token ) _ { 
   return body
 }
 
@@ -30,12 +30,16 @@ euclid = value:token '(' _ pulses:token ',' _ slots:token ')' {
   return { type:'euclid', value, pulses, slots }
 }
 
+degrade = value:(number / word / list ) '?' { 
+  return { type:'degrade', value }
+}
+
 // return a rest object
 rest = '~' { 
  return { type:'rest' } 
 }
 
-token = (number / rest / word / list )
+token = ( number / rest / word / list )
 
 // identifies an array of groups delimited by '.' characters 
 feet = start:foot+ end:(token _)+ {
@@ -87,10 +91,11 @@ body:pattern* _ delimiter:( "]" / "}" ) {
 }
 
 dot = '.'
+question = '?'
 
 // match one or more tokens or expressions that does not 
 // contain [], {}, or + - * /
-word "word" = value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '.' '~' ]+ {
+word "word" = value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '.' '~' '?']+ {
   return { type:typeof value, value }
 }
 
@@ -105,3 +110,4 @@ number = "-"? (([0-9]+ "." [0-9]*) / ("."? [0-9]+)) {
 
 // match zero or more whitespaces (tabs, spaces, newlines)
 _ "whitespace" = [ \t\n\r ]*
+
