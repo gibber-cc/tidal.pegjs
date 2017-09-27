@@ -27,7 +27,11 @@ euclid = value:token '(' _ pulses:token ',' _ slots:token ')' {
   return { type:'euclid', value, pulses, slots }
 }
 
-token = (number / word / list )
+rest = '~' { 
+ return { type:'rest' } 
+}
+
+token = (number / rest / word / list )
  
 feets = start:feet+ end:(token _)+ {
   const __end = end.map( v => v[0] )
@@ -79,7 +83,7 @@ dot = '.' { return { type:'string', value:'.' } }
 
 // match one or more tokens or expressions that does not 
 // contain [], {}, or + - * /
-word "word" = value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '+' '-' '.' ]+ {
+word "word" = value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '+' '-' '.' '~' ]+ {
   return { type:typeof value, value }
 }
 
