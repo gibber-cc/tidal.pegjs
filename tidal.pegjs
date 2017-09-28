@@ -26,13 +26,16 @@ repeat = value:token op:op repeatValue:token {
 
 // match bjorklund(aka euclidiean) rhythm, a la 5(3,8)
 // return as an object with type, pulses and slots properties.
-euclid = value:token '(' _ pulses:token ',' _ slots:token ')' {
+euclid = value:token _ openparen _ pulses:token ',' _ slots:token _ closeparen {
   return { type:'euclid', value, pulses, slots }
 }
 
 degrade = value:(number / word / list ) '?' { 
   return { type:'degrade', value }
 }
+
+openparen = '('
+closeparen= ')'
 
 // return a rest object
 rest = '~' { 
@@ -110,4 +113,3 @@ number = "-"? (([0-9]+ "." [0-9]*) / ("."? [0-9]+)) {
 
 // match zero or more whitespaces (tabs, spaces, newlines)
 _ "whitespace" = [ \t\n\r ]*
-
