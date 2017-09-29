@@ -28,20 +28,17 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
    *
    */
 
-  it( 'Array brackets [] should return an array marked as a group.', () => {
+  it( 'Array brackets [] should return an array marked as a pattern.', () => {
     const group = [
       { type:'number', value: 0 },
       { type:'number', value: 1 },
       { type:'number', value: 2 },
     ]
-    group.type  = 'group'
-    
-    const pattern = [ group ]
-    pattern.type  = 'pattern'
+    group.type  = 'pattern'
 
     const result = parser.parse( '[ 0 1 2 ]' )
       
-    assert.deepEqual( pattern, result )
+    assert.deepEqual( group, result )
   })
 
   /* 
@@ -60,7 +57,7 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
    *
    */
 
-  it( 'Nested brackets should return nested groups.', () => {
+  it( 'Nested brackets should return nested patterns.', () => {
     const nestedGroup = [
       [
         { type:'number', value:0 },
@@ -71,9 +68,9 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
         { type:'number', value:3 }, 
         { type:'number', value:4 } 
       ]
-    ].map( v => { v.type = 'group'; return v } )
+    ].map( v => { v.type = 'pattern'; return v } )
 
-    nestedGroup.type = 'group'
+    nestedGroup.type = 'pattern'
 
     const pattern = [ { type:'number', value:0 }, nestedGroup, { type:'number', value:5 } ]
     pattern.type = 'pattern'
@@ -94,9 +91,9 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
         { type:'number', value:3 }, 
         { type:'number', value:4 } 
       ]
-    ].map( v => { v.type = 'group'; return v } )
+    ].map( v => { v.type = 'pattern'; return v } )
 
-    groups.type = 'group'
+    groups.type = 'pattern'
 
     const pattern = [ groups ]
     pattern.type = 'pattern'

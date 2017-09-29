@@ -30,17 +30,14 @@ describe( 'Testing repeats.', () => {
    */
 
   it( 'should generate a 2x repeat on a number.', () => {
-    const pattern = [
-      { 
+    const pattern = { 
         type:'repeat',
         value: { type:'number', value:0 },
-        op: '*',
+        operator: '*',
         repeatValue:{ type:'number', value:2 },
       }
-    ]
-    pattern.type  = 'pattern'
 
-    const result = parser.parse( '0*2' )
+    const result = parser.parse( "0*2" )
 
     assert.deepEqual( pattern, result )
   })
@@ -67,21 +64,19 @@ describe( 'Testing repeats.', () => {
    */
 
   it( 'should generate a 2x repeat on a pattern group.', () => {
-    const pattern = [
-      { 
-        type:'repeat',
-        value: [
-          { type:'number', value:0 },
-          { type:'number', value:1 },
-        ],
-        op: '*',
-        repeatValue:{ type:'number', value:2 },
-      }
-    ]
-    pattern[0].value.type = 'group'
-    pattern.type  = 'pattern'
+    const pattern = { 
+      type:'repeat',
+      value: [
+        { type:'number', value:2 },
+        { type:'number', value:1 },
+      ],
+      operator: '*',
+      repeatValue:{ type:'number', value:2 },
+    }
 
-    const result = parser.parse( '[0 1]*2' )
+    pattern.value.type = 'pattern'
+
+    const result = parser.parse( '[2 1]*2' )
 
     assert.deepEqual( pattern, result )
   })
