@@ -138,8 +138,8 @@
 
     var peg$FAILED = {},
 
-        peg$startRuleFunctions = { top: peg$parsetop },
-        peg$startRuleFunction  = peg$parsetop,
+        peg$startRuleFunctions = { pattern: peg$parsepattern },
+        peg$startRuleFunction  = peg$parsepattern,
 
         peg$c0 = peg$otherExpectation("term"),
         peg$c1 = function(body) { return body },
@@ -369,7 +369,7 @@
       );
     }
 
-    function peg$parsetop() {
+    function peg$parsepattern() {
       var s0;
 
       s0 = peg$parseeuclid();

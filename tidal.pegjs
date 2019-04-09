@@ -1,4 +1,4 @@
-top =  euclid / repeat / polyrhythm / group / list
+pattern =  euclid / repeat / polyrhythm / group / list
 
 // generic term for matching in groups
 term "term" = body:(
