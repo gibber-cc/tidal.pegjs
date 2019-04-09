@@ -1,6 +1,6 @@
-/* test-patterngroup.js
+/* test-groupgroup.js
  *
- * A test of pattern groups. 
+ * A test of group groups.
  *
  */
 
@@ -8,10 +8,10 @@ const peg    = require( 'pegjs' )
 const fs     = require( 'fs' )
 const assert = require( 'assert')
 
-const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' }) 
+const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' })
 const parser  = peg.generate( grammar )
 
-describe( 'Testing pattern groups and nested pattern groups.', () => { 
+describe( 'Testing group groups and nested group groups.', () => {
 
   /*
    * "[ 0 1 2 ]" ->
@@ -23,25 +23,25 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
    *     { type:'number', value: 2 },
    *     type:'group'
    *   ]
-   *   type:'pattern'
+   *   type:'group'
    * ]
    *
    */
 
-  it( 'Array brackets [] should return an array marked as a pattern.', () => {
+  it( 'Array brackets [] should return an array marked as a group.', () => {
     const group = [
       { type:'number', value: 0 },
       { type:'number', value: 1 },
       { type:'number', value: 2 },
     ]
-    group.type  = 'pattern'
+    group.type  = 'group'
 
     const result = parser.parse( '[ 0 1 2 ]' )
-      
+
     assert.deepEqual( group, result )
   })
 
-  /* 
+  /*
    * "0 [[ 0 1 2] [ 3 4 ]] 5" ->
    *
    * [
@@ -52,54 +52,54 @@ describe( 'Testing pattern groups and nested pattern groups.', () => {
    *     type:'group'
    *   ],
    *   5,
-   *   type:'pattern'
+   *   type:'group'
    * ]
    *
    */
 
-  it( 'Nested brackets should return nested patterns.', () => {
+  it( 'Nested brackets should return nested groups.', () => {
     const nestedGroup = [
       [
         { type:'number', value:0 },
         { type:'number', value:1 },
         { type:'number', value:2 },
       ],
-      [ 
-        { type:'number', value:3 }, 
-        { type:'number', value:4 } 
+      [
+        { type:'number', value:3 },
+        { type:'number', value:4 }
       ]
-    ].map( v => { v.type = 'pattern'; return v } )
+    ].map( v => { v.type = 'group'; return v } )
 
-    nestedGroup.type = 'pattern'
+    nestedGroup.type = 'group'
 
-    const pattern = [ { type:'number', value:0 }, nestedGroup, { type:'number', value:5 } ]
-    pattern.type = 'pattern'
+    const group = [ { type:'number', value:0 }, nestedGroup, { type:'number', value:5 } ]
+    group.type = 'group'
 
     const result = parser.parse( '0 [[ 0 1 2 ] [ 3 4 ]] 5' )
 
-    assert.deepEqual( pattern, result )
+    assert.deepEqual( group, result )
   })
 
-  it( '"Marking out feet" should divide patterns into groups.', () => {
-    const groups = [ 
+  it( '"Marking out feet" should divide groups into groups.', () => {
+    const groups = [
       [
         { type:'number', value:0 },
         { type:'number', value:1 },
         { type:'number', value:2 },
       ],
-      [ 
-        { type:'number', value:3 }, 
-        { type:'number', value:4 } 
+      [
+        { type:'number', value:3 },
+        { type:'number', value:4 }
       ]
-    ].map( v => { v.type = 'pattern'; return v } )
+    ].map( v => { v.type = 'group'; return v } )
 
-    groups.type = 'pattern'
+    groups.type = 'group'
 
-    const pattern = [ groups ]
-    pattern.type = 'pattern'
+    const group = [ groups ]
+    group.type = 'group'
 
     const result = parser.parse( '0 1 2 . 3 4' )
 
-    assert.deepEqual( pattern, result )
+    assert.deepEqual( group, result )
   })
 })

@@ -8,10 +8,10 @@ const peg    = require( 'pegjs' )
 const fs     = require( 'fs' )
 const assert = require( 'assert')
 
-const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' }) 
+const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' })
 const parser  = peg.generate( grammar )
 
-describe( 'Testing repeats.', () => { 
+describe( 'Testing repeats.', () => {
   /*
    * "0*2"
    *
@@ -21,16 +21,16 @@ describe( 'Testing repeats.', () => {
    *    {
    *      type:'repeat',
    *      value:{ type:'number', value:0 },
-   *      mod:'*', 
+   *      mod:'*',
    *      repeatValue:{ type:'number', value:2 },
-   *    } 
-   *    type:'pattern'
+   *    }
+   *    type:'group'
    *  ]
    *
    */
 
   it( 'should generate a 2x repeat on a number.', () => {
-    const pattern = { 
+    const group = {
         type:'repeat',
         value: { type:'number', value:0 },
         operator: '*',
@@ -39,7 +39,7 @@ describe( 'Testing repeats.', () => {
 
     const result = parser.parse( "0*2" )
 
-    assert.deepEqual( pattern, result )
+    assert.deepEqual( group, result )
   })
 
   /*
@@ -55,16 +55,16 @@ describe( 'Testing repeats.', () => {
    *        { type:'number', value:1 },
    *        type:'group'
    *      ],
-   *      mod:'*', 
+   *      mod:'*',
    *      repeatValue:{ type:'number', value:2 },
-   *    } 
-   *    type:'pattern'
+   *    }
+   *    type:'group'
    *  ]
    *
    */
 
-  it( 'should generate a 2x repeat on a pattern group.', () => {
-    const pattern = { 
+  it( 'should generate a 2x repeat on a group group.', () => {
+    const group = {
       type:'repeat',
       value: [
         { type:'number', value:2 },
@@ -74,10 +74,10 @@ describe( 'Testing repeats.', () => {
       repeatValue:{ type:'number', value:2 },
     }
 
-    pattern.value.type = 'pattern'
+    group.value.type = 'group'
 
     const result = parser.parse( '[2 1]*2' )
 
-    assert.deepEqual( pattern, result )
+    assert.deepEqual( group, result )
   })
 })

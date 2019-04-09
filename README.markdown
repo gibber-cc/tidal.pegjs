@@ -14,14 +14,14 @@ By default the file exports a global named `Tidal` that has a `parse` method for
   <body></body>
   <script>
     const test = Tidal.parse( '0 1 2' )
-    console.log( test ) 
+    console.log( test )
     /*
     outputs:
      [ 
        { type:'number', value:0 },
        { type:'number', value:1 },
        { type:'number', value:2 },
-       type:'pattern' 
+       type:'group'
      ]
     */
   </script>
@@ -33,37 +33,37 @@ If you'd like to use JS modules of some type instead of a global, see the develo
 ## Parsing
 Below are a couple of simple examples of what the parser outputs:
 
-`0 2 4 6` => `[ 0, 2, 4, 6, type: 'pattern' ]`
+`0 2 4 6` => `[ 0, 2, 4, 6, type: 'group' ]`
 
 `0 [[2 3] [2 4(3,8) 7*2]] 5` =>
 
 ```js
 [
-  { type:'number', value:0 }, 
+  { type:'number', value:0 },
   [
-    [ 
-      { type:'number', value:2 }, { type:'number', value:3 }, type:'group' 
+    [
+      { type:'number', value:2 }, { type:'number', value:3 }, type:'group'
     ],
     [
-      { type:'number', value:2 }, 
+      { type:'number', value:2 },
       {
         "type": "euclid",
         "value":  { type:'number', value:4 },
         "pulses": { type:'number', value:3 },
         "slots":  { type:'number', value:8 }
-      }, 
+      },
       {
         "type": "binop",
         "left": { type:'number', value:7 },
         "op":   "*",
-        "right":{ type:'number', value:2 } 
+        "right":{ type:'number', value:2 }
       },
       type:'group'
     ],
     type:'group'
-  ], 
+  ],
   { type:'number', value:5 },
-  type:'pattern'
+  type:'group'
 ]
 
 ```

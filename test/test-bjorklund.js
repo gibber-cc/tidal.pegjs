@@ -1,6 +1,6 @@
 /* test-bjorklund.js
  *
- * A test for matching Euclidean rhythms in the Tidal DSL 
+ * A test for matching Euclidean rhythms in the Tidal DSL
  *
  */
 
@@ -9,10 +9,10 @@ const fs     = require( 'fs' )
 const assert = require( 'assert')
 const util   = require( 'util' )
 
-const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' }) 
+const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' })
 const parser  = peg.generate( grammar )
 
-describe( 'Testing Euclidean rhythms.', () => { 
+describe( 'Testing Euclidean rhythms.', () => {
   /*
    * "60( 3,8 )
    *
@@ -25,22 +25,22 @@ describe( 'Testing Euclidean rhythms.', () => {
    *      pulses:{ type:'number', value:3 },
    *      slots: { type:'number', value:8 }
    *    },
-   *    type:'pattern'
+   *    type:'group'
    *  ]
    *
    */
 
   it( 'should generate a euclidean rhythm', () => {
-    const pattern = {
+    const group = {
       value: { type:'number', value:60 },
       pulses:{ type:'number', value:3  },
       slots: { type:'number', value:8  },
       type:  'euclid'
     }
-    
+
     const result = parser.parse( '60( 3,8 )' )
 
-    assert.deepEqual( pattern, result )
+    assert.deepEqual( group, result )
   })
 
   /*
@@ -59,29 +59,29 @@ describe( 'Testing Euclidean rhythms.', () => {
    *      ],
    *      slots: { type:'number', value:8 }
    *    },
-   *    type:'pattern'
+   *    type:'group'
    *  ]
    *
    */
 
-  it( 'should generate a euclidean rhythm with a pattern determining pulses', () => {
-    const pattern = 
+  it( 'should generate a euclidean rhythm with a group determining pulses', () => {
+    const group =
       {
         value: { type:'number', value:60 },
-        pulses:[ 
+        pulses:[
           { type:'number', value:3 },
           { type:'number', value:5 },
         ],
         slots: { type:'number', value:8  },
         type:  'euclid'
       }
-    
 
-    pattern.pulses.type = 'pattern'
+
+    group.pulses.type = 'group'
 
     const result = parser.parse( '60( [3 5],8 )' )
 
-    assert.deepEqual( pattern, result )
+    assert.deepEqual( group, result )
   })
 
 })
