@@ -1,6 +1,6 @@
-/* test-polyrhythm.js
+/* test-layer.js
  *
- * A test of polyrhythms and nested polyrhythms.
+ * A test of layers and nested layers.
  *
  */
 
@@ -12,7 +12,7 @@ const util   = require( 'util' )
 const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' })
 const parser  = peg.generate( grammar )
 
-describe( 'Testing polyrhythms and nested polyrhythms.', () => {
+describe( 'Testing layers and nested layers.', () => {
 
   /*
    * "[ 0 1 2, 4 5 ]" ->
@@ -29,13 +29,13 @@ describe( 'Testing polyrhythms and nested polyrhythms.', () => {
    *        { type:'number', value:4 },
    *        type:'group'
    *     ],
-   *     type:'polyrhythm'
+   *     type:'layer'
    *   ]
    *
    */
 
-  it( 'Commas should return a group marked as a polyrhythm', () => {
-    const polyrhythm = [
+  it( 'Commas should return a group marked as a layer', () => {
+    const layer = [
       [
         { type:'number', value:0 },
         { type:'number', value:1 },
@@ -47,9 +47,9 @@ describe( 'Testing polyrhythms and nested polyrhythms.', () => {
       ]
     ].map( v => { v.type = 'group'; return v })
 
-    polyrhythm.type  = 'polyrhythm'
+    layer.type  = 'layer'
 
-    const group = polyrhythm
+    const group = layer
 
     const result = parser.parse( '[ 0 1 2, 3 4 ]' )
 

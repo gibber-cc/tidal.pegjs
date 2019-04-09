@@ -197,7 +197,7 @@
         },
         peg$c30 = function(body, end) {
           const concurrent = []
-          concurrent.type = 'polyrhythm'
+          concurrent.type = 'layer'
 
           for( let i = 0; i < body.length; i++ ) {
           	concurrent.push( body[ i ][ 0 ] )
@@ -376,7 +376,7 @@
       if (s0 === peg$FAILED) {
         s0 = peg$parserepeat();
         if (s0 === peg$FAILED) {
-          s0 = peg$parsepolyrhythm();
+          s0 = peg$parselayer();
           if (s0 === peg$FAILED) {
             s0 = peg$parsegroup();
             if (s0 === peg$FAILED) {
@@ -396,7 +396,7 @@
       s0 = peg$currPos;
       s1 = peg$parsepolymeter();
       if (s1 === peg$FAILED) {
-        s1 = peg$parsepolyrhythm();
+        s1 = peg$parselayer();
         if (s1 === peg$FAILED) {
           s1 = peg$parsedegrade();
           if (s1 === peg$FAILED) {
@@ -1073,7 +1073,7 @@
       return s0;
     }
 
-    function peg$parsepolyrhythm() {
+    function peg$parselayer() {
       var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       s0 = peg$currPos;
@@ -1091,7 +1091,7 @@
           if (s3 !== peg$FAILED) {
             s4 = [];
             s5 = peg$currPos;
-            s6 = peg$parsenotpolyrhythm();
+            s6 = peg$parsenotlayer();
             if (s6 !== peg$FAILED) {
               s7 = peg$parse_();
               if (s7 !== peg$FAILED) {
@@ -1127,7 +1127,7 @@
               while (s5 !== peg$FAILED) {
                 s4.push(s5);
                 s5 = peg$currPos;
-                s6 = peg$parsenotpolyrhythm();
+                s6 = peg$parsenotlayer();
                 if (s6 !== peg$FAILED) {
                   s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
@@ -1164,7 +1164,7 @@
               s4 = peg$FAILED;
             }
             if (s4 !== peg$FAILED) {
-              s5 = peg$parsenotpolyrhythm();
+              s5 = peg$parsenotlayer();
               if (s5 !== peg$FAILED) {
                 s6 = peg$parse_();
                 if (s6 !== peg$FAILED) {
@@ -1217,7 +1217,7 @@
       return s0;
     }
 
-    function peg$parsenotpolyrhythm() {
+    function peg$parsenotlayer() {
       var s0, s1, s2;
 
       s0 = peg$currPos;

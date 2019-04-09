@@ -1,8 +1,8 @@
-pattern =  euclid / repeat / polyrhythm / group / list
+pattern =  euclid / repeat / layer / group / list
 
 // generic term for matching in groups
 term "term" = body:(
-  polymeter / polyrhythm / degrade / repeat / feet / group / euclid  / number / word / rest
+  polymeter / layer / degrade / repeat / feet / group / euclid  / number / word / rest
 ) _ { return body }
 
 // a list (which is a group)
@@ -66,9 +66,9 @@ notfoot = degrade / polymeter / rest repeat / euclid / group / number / word
 
 // basically, get each list and push into an array while leaving out whitespace
 // and commas
-polyrhythm = _ '[' _ body:(notpolyrhythm _ ',' _ )+ end:notpolyrhythm _ ']'_ {
+layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
   const concurrent = []
-  concurrent.type = 'polyrhythm'
+  concurrent.type = 'layer'
 
   for( let i = 0; i < body.length; i++ ) {
   	concurrent.push( body[ i ][ 0 ] )
@@ -81,7 +81,7 @@ polyrhythm = _ '[' _ body:(notpolyrhythm _ ',' _ )+ end:notpolyrhythm _ ']'_ {
 
   return concurrent
 }
-notpolyrhythm = body:(list / euclid / polymeter / group / number / word / rest ) _ { return body }
+notlayer = body:(list / euclid / polymeter / group / number / word / rest ) _ { return body }
 
 word "word" = _ value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '.' '~' '?' ',']+ _ {
   return { type:typeof value, value }
