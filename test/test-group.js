@@ -37,4 +37,23 @@ describe( 'Testing simple number series groups.', () => {
     assert.deepEqual( answer, result )
   })
 
+  /*
+    "a" ->
+    [
+      {type:'string', value: "a"},
+      type: 'group'
+    ]
+  */
+
+  it ('"a" should parse to an array of 1 string, marked as group.', () => {
+    const answer = [
+      {type:'string', value: 'a'}
+    ]
+    answer.type = 'group'
+
+    const result = parser.parse('a')
+
+    assert.deepEqual(answer, result)
+  })
+
 })
