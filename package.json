@@ -21,5 +21,8 @@
   "license": "MIT",
   "devDependencies": {
     "pegjs": "^0.10.0"
+  },
+  "dependencies": {
+    "fraction.js": "^4.0.12"
   }
 }

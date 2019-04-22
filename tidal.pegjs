@@ -1,19 +1,58 @@
+{
+  // Use fraction library to specify sections within a cycle
+  var Fraction = require('fraction.js');
+
+  /**Parse a body and return with fractions corresponding to location in cycles and subcycles
+  */
+  function parse(body, start = new Fraction(0), end = new Fraction(1)){
+
+    let cycleBody = {};
+    let cycleSection = start;
+    let frac = new Fraction(end/body.length);
+
+    for( let i = 0; i < body.length; i++ ) {
+      cycleBody[cycleSection.toFraction(false)] = body[i];
+      cycleSection = new Fraction(cycleSection).add(frac);
+    }
+    return cycleBody;
+  }
+
+}
+
+
 pattern =  euclid / repeat / layer / group / list / onestep
 
 
 // generic term for matching in groups
 term "term" = body:(
   polymeter / layer / degrade / repeat / feet / group / euclid  / number / word / rest / onestep
-) _ { return body }
+) _ {
+  // console.log(body)
+  // let array = []
+  // array.push(body)
+  // console.log(parse(array))
+  return body
+}
 
 
 // a list (which is a group)
-list = _ body:term+ _ { body.type = 'group'; return body }
+list = _ body:term+ _ {
+  body = parse(body)
+  body.type = 'group'
+
+  //console.log("list", flatten(body))
+
+  return body
+}
 
 
 // a group
 group "group" = _ '[' _ body:term+ _ ']' _ {
+  body = parse(body)
   body.type = 'group'
+
+  //console.log("group", flatten(body))
+
   return body
 }
 
@@ -55,17 +94,21 @@ rest = '~' {
 
 // identifies an array of groups delimited by '.' characters
 feet = start:foot+ end:term+ {
+  end = parse(end)
   end.type = 'group'
 
-  start.push( end )
-  start.type = 'group'
+  start = start[0]
 
-  return start
+  let result = parse([start, end])
+  //result.type='group'
+  console.log("RESULT:", result, "END OF RESULT")
+  return result
 }
 // identifies a group delimited by a '.' character
 foot = value:notfoot+ dot _ {
-  //let group = value.map( v => v[0] )
+  value = parse(value)
   value.type = 'group'
+  console.log("VALUE:",value[0], "END OF VALUE")
   return value
 }
 // avoid left-recursions

@@ -135,6 +135,7 @@
 
   function peg$parse(input, options) {
     options = options !== void 0 ? options : {};
+    console.log("these are my options",options)
 
     var peg$FAILED = {},
 
