@@ -25,7 +25,7 @@ describe( 'Testing group groups and nested group groups.', () => {
 
     const result = parser.parse( '[ 0 1 2 ]' )
 
-    // assert.deepEqual( result, expected )
+    assert.deepEqual( result, expected )
   })
 
 
@@ -45,7 +45,7 @@ describe( 'Testing group groups and nested group groups.', () => {
 
     const result = parser.parse( '0 [1 2 3] 4' )
 
-    // assert.deepEqual( result, expected )
+    assert.deepEqual( result, expected )
 
 
   })
@@ -75,12 +75,12 @@ describe( 'Testing group groups and nested group groups.', () => {
 
     const result = parser.parse( '0 [[ 0 1 2 ] [ 3 4 ]] 5' )
 
-    // assert.deepEqual( result, expected )
+    assert.deepEqual( result, expected )
 
   })
 
 
-  it( '"Marking flattened feet" should divide groups into groups.', () => {
+  it( "Marking flattened feet with '.' should divide groups into groups.", () => {
     const expected =
     {
       '0': {

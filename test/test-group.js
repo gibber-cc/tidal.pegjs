@@ -13,16 +13,6 @@ const parser  = peg.generate( grammar )
 
 describe( 'Testing simple number series groups.', () => {
 
-  /*
-    '0 1 2' -> not flattened or flattened
-    {
-      '0': {type: 'number', value: 0},
-      '1/3': {type: 'number', value: 1},
-      '2/3': {type: 'number', value: 2},
-      type: 'group'
-    }
-  */
-
 
   it( '"0 1 2" should parse to an array of three numbers, marked as a group.', () => {
     const expected = {
@@ -36,13 +26,6 @@ describe( 'Testing simple number series groups.', () => {
     assert.deepEqual( expected, result )
   })
 
-  /*
-    'a' -> not flattened or flattened
-    {
-      '0': {type: 'string', value: 'a'},
-      type: 'group'
-    }
-  */
 
   it ('"a" should parse to an array of 1 string, marked as group.', () => {
 
