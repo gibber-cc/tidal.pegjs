@@ -152,28 +152,25 @@ notlayer = body:(list / euclid / polymeter / group / number / word / rest / ones
 
 
 // One-step
-onestep = _ '<'  _ body:(notonestep _ ',' _ )+ end:notonestep _'>'_ {
+onestep = _ '<'  _ body:(notonestep _ ','? _ )+ end:notonestep? _'>'_ {
 
-  // let result = []
-  // result.push(body[0])
-  // result = parse(result)
-  // result.type = 'onestep'
-  //
-  // return result
-  // const concurrent = []
-  //
-  // for( let i = 0; i < body.length; i++ ) {
-  //   concurrent.push( body[ i ][ 0 ] )
-  //   concurrent[ concurrent.length - 1 ].type = 'group'
-  // }
-  //
-  // end.type = 'group'
-  // concurrent.push( end )
-  //
-  // let result = parse(concurrent)
-  // result.type = 'onestep'
-  //
-  // return result
+  const concurrent = []
+
+  for( let i = 0; i < body.length; i++ ) {
+    concurrent.push( body[ i ][ 0 ] )
+    concurrent[ concurrent.length - 1 ].type = 'group'
+  }
+
+  if (end){
+    end.type = 'group'
+    concurrent.push( end )
+  }
+
+
+  let result = parse(concurrent)
+  result.type = 'onestep'
+
+  return result
 }
 notonestep = body:(list / euclid / polymeter / group / number / word / rest / layer) _ { return body }
 
