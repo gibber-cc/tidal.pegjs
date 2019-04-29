@@ -110,8 +110,8 @@ notfoot = degrade / polymeter / rest repeat / euclid / group / number / word / o
 // basically, get each list and push into an array while leaving out whitespace
 // and commas
 layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
+
   const concurrent = []
-  concurrent.type = 'layer'
 
   for( let i = 0; i < body.length; i++ ) {
   	concurrent.push( body[ i ][ 0 ] )
@@ -119,10 +119,12 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
   }
 
   end.type = 'group'
-
   concurrent.push( end )
 
-  return concurrent
+  let result = parse(concurrent)
+  result.type = 'layer'
+
+  return result
 }
 notlayer = body:(list / euclid / polymeter / group / number / word / rest / onestep) _ { return body }
 
