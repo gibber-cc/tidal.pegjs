@@ -24,5 +24,13 @@
   },
   "dependencies": {
     "fraction.js": "^4.0.12"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mariana0pachon/tidal.pegjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mariana0pachon/tidal.pegjs/issues"
+  },
+  "homepage": "https://github.com/mariana0pachon/tidal.pegjs#readme"
 }

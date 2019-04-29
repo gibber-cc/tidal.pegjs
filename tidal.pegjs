@@ -2,13 +2,13 @@
   var Fraction = require('fraction.js');
 
     /**
-     * Parse a Tidal pattern to create an object
+     * parseToObject a Tidal pattern to create an object
      * @param   {String}   body      the Tidal pattern to be parsed
      * @param   {Fraction} start = 0 the starting point in the cycle of the pattern
      * @param   {Fraction} end = 0   the ending point in the cycle of the pattern
      * @return  {Object}             the parsed object
      */
-  function parse(body, start = new Fraction(0), end = new Fraction(1)){
+  function parseToObject(body, start = new Fraction(0), end = new Fraction(1)){
 
     let cycleBody = {};
     let cycleSection = start;
@@ -34,7 +34,7 @@ term "term" = body:(
 
 // a list (which is a group)
 list = _ body:term+ _ {
-  body = parse(body)
+  body = parseToObject(body)
   body.type = 'group'
   return body
 }
@@ -43,7 +43,7 @@ list = _ body:term+ _ {
 // a group
 group "group" = _ '[' _ body:term+ _ ']' _ {
   // console.log(typeof body, "in group")
-  body = parse(body)
+  body = parseToObject(body)
   body.type = 'group'
   return body
 }
@@ -85,9 +85,9 @@ notrepeat = body:(euclid / polymeter / group / number / word / rest /onestep) _ 
 
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
 
-  left = parse(left)
+  left = parseToObject(left)
   left.type = 'group'
-  right = parse(right)
+  right = parseToObject(right)
   right.type = 'group'
 
   let result = {
@@ -109,13 +109,13 @@ rest = '~' {
 // identifies an array of groups delimited by '.' characters
 feet = start:foot+ end:term+ {
 
-  start = parse(start[0])
+  start = parseToObject(start[0])
   start.type = 'group'
 
-  end = parse(end)
+  end = parseToObject(end)
   end.type = 'group'
 
-  let result = parse([start, end])
+  let result = parseToObject([start, end])
   result.type = 'group'
 
   return result
@@ -143,7 +143,7 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
   end.type = 'group'
   concurrent.push( end )
 
-  let result = parse(concurrent)
+  let result = parseToObject(concurrent)
   result.type = 'layer'
 
   return result
@@ -167,7 +167,7 @@ onestep = _ '<'  _ body:(notonestep _ ','? _ )+ end:notonestep? _'>'_ {
   }
 
 
-  let result = parse(concurrent)
+  let result = parseToObject(concurrent)
   result.type = 'onestep'
 
   return result
