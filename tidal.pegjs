@@ -49,12 +49,19 @@ group "group" = _ '[' _ body:term+ _ ']' _ {
 }
 
 
-// bjorklund
-euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term ')' _ {
+// // bjorklund
+euclid = _ value:noteuclid '(' _ soundNum:term+ ',' _ steps:term+ _ ')'? ','? _ rotateStep:term* _ ')'? {
 
-  if (pulses.type === 'group') delete pulses.type;
+  let result = {};
+  result.soundNum = soundNum[0];
+  if (result.soundNum.type === 'group') delete result.soundNum.type;
+  result.steps = steps[0];
+  if (rotateStep) result.rotateStep = rotateStep[0];
+  else result.rotateStep = null;
+  result.value = value;
+  result.type = 'euclid';
 
-  return { type:'euclid', value, pulses, slots }
+  return result;
 }
 // avoid left-recursions
 noteuclid = body:( group / number / word / rest / onestep) _ { return body }
@@ -70,46 +77,7 @@ notdegrade = body:( repeat / euclid / group / number / word / onestep) _ { retur
 
 // match a binary operation, a la 4*2, or [0 1]*4
 repeat = value:notrepeat _ operator:op  _ repeatValue:term {
-
-  let result = {};
-  result.type = 'repeat';
-  result.operator = operator;
-  result.repeatValue = repeatValue;
-  result.value = value;
-
-  // let duration = new Fraction(1, (repeatValue.value * (Object.keys(value).length - 1)));
-  //
-  // let currentPosition = new Fraction(0);
-  //
-  // console.log(value)
-  //
-  // for (let i = 0; i < repeatValue.value; i++){
-  //
-  //   for ()
-  //
-  //   if (value.type === 'group'){
-  //     for (let entry in value){
-  //
-  //       if (entry === 'type') continue;
-  //
-  //       result[currentPosition.toFraction(false)] = entry;
-  //       currentPosition = currentPosition.add(duration);
-  //     }
-  //   }
-  //   else{
-  //     result[currentPosition.toFraction(false)] = value;
-  //     currentPosition = currentPosition.add(duration);
-  //   }
-  // }
-
-  return result;
-
-  /*
-    Use this code intstead for a result with operator, repeat value and
-    pattern to repeat instead of object with the appropriate number of repeats
-
-    //return { type:'repeat', value, operator, repeatValue }
-   */
+  return { type:'repeat', operator, repeatValue, value }
 }
 // avoid left-recursions
 notrepeat = body:(euclid / polymeter / group / number / word / rest /onestep) _ { return body }
