@@ -7,67 +7,50 @@
 //  const fs     = require( 'fs' )
 //  const assert = require( 'assert')
 //  const util   = require( 'util' )
-//
+// 
 //  const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' })
 //  const parser  = peg.generate( grammar )
 //
 //  describe('Testing one-step per cycle', () => {
 //
-//    /*
-//       "<0 1 2>" ->
-//       [
-//         [
-//           [
-//             {type: 'number', value: 0},
-//             {type: 'number', value: 1},
-//             {type: 'number', value: 2},
-//             type: 'group'
-//          ],
-//          type: 'onestep'
-//        ],
-//        type: 'group'
-//      ]
-//
-//    **/
-//
 //    it('<> should return a group marked as onestep', () => {
-//      const onestep = [
-//        [
-//          [
-//            {type: 'number', value: 0},
-//            {type: 'number', value: 1},
-//            {type: 'number', value: 2}
-//         ]
-//       ]
-//      ]
+//      const expected = {
+//        '0': {
+//          '0': {type: 'number', value: 0},
+//          '1/3': {type: 'number', value: 1},
+//          '2/3': {type: 'number', value: 2},
+//          type: 'group'
+//        },
+//        type: 'onestep'
+//      }
 //
-//      onestep[0][0].type = 'group'
-//      onestep[0].type = 'onestep'
-//      onestep.type = 'group'
+//       const result = parser.parse('<0 1 2>')[0]
 //
-//      const result = parser.parse('<0 1 2>')
+//       assert.deepEqual( expected, result )
 //
-//      assert.deepEqual(onestep, result)
+//    });
+//
+//
+//    it('multiple <> should return nested group marked as onestep', () => {
+//
+//      const expected = {
+//        '0': {
+//          '0': {type: 'number', value: 0},
+//          '1/3': {type: 'number', value: 1},
+//          '2/3': {type: 'number', value: 2},
+//          type: 'group'
+//        },
+//        '1/2': {
+//          '0': {type: 'number', value: 3},
+//          '1/3': {type: 'number', value: 4},
+//          '2/3': {type: 'number', value: 5},
+//          type: 'group'
+//        },
+//        type: 'onestep'
+//      }
+//
+//      assert.deepEqual( expected, parser.parse('<0 1 2, 3 4 5>')[0] )
 //
 //    })
-//
-//    /*
-//       "<0 1 2, 3 4 5>" ->
-//       [
-//         [
-//           [
-//             {type: 'number', value: 0},
-//             {type: 'number', value: 1},
-//             {type: 'number', value: 2},
-//             type: 'group'
-//          ],
-//          type: 'onestep'
-//        ],
-//        type: 'group'
-//      ]
-//
-//
-//
-//    **/
 //
 //  })

@@ -13,25 +13,9 @@
 // const parser  = peg.generate( grammar )
 //
 // describe( 'Testing Euclidean rhythms.', () => {
-//   /*
-//    * "60( 3,8 )
-//    *
-//    * ->
-//    *
-//    *  [
-//    *    {
-//    *      type:'euclid',
-//    *      value: { type:'number', value:60 },
-//    *      pulses:{ type:'number', value:3 },
-//    *      slots: { type:'number', value:8 }
-//    *    },
-//    *    type:'group'
-//    *  ]
-//    *
-//    */
 //
 //   it( 'should generate a euclidean rhythm', () => {
-//     const group = {
+//     const expected = {
 //       value: { type:'number', value:60 },
 //       pulses:{ type:'number', value:3  },
 //       slots: { type:'number', value:8  },
@@ -40,48 +24,41 @@
 //
 //     const result = parser.parse( '60( 3,8 )' )
 //
-//     assert.deepEqual( group, result )
-//   })
+//     assert.deepEqual( expected, result )
+//   });
 //
-//   /*
-//    * "60( [3,5],8 )
-//    *
-//    * ->
-//    *
-//    *  [
-//    *    {
-//    *      type:'euclid',
-//    *      value: { type:'number', value:60 },
-//    *      pulses:[
-//    *        { type:'number', value:3 },
-//    *        { type:'number', value:5 },
-//    *        type:'group'
-//    *      ],
-//    *      slots: { type:'number', value:8 }
-//    *    },
-//    *    type:'group'
-//    *  ]
-//    *
-//    */
 //
 //   it( 'should generate a euclidean rhythm with a group determining pulses', () => {
-//     const group =
-//       {
-//         value: { type:'number', value:60 },
-//         pulses:[
-//           { type:'number', value:3 },
-//           { type:'number', value:5 },
-//         ],
-//         slots: { type:'number', value:8  },
-//         type:  'euclid'
-//       }
-//
-//
-//     group.pulses.type = 'group'
+//     const group ={
+//       value: { type:'number', value:60 },
+//       pulses:{
+//         '0': { type:'number', value:3 },
+//         '1/2': { type:'number', value:5 },
+//       },
+//       slots: { type:'number', value:8  },
+//       type:  'euclid'
+//     }
 //
 //     const result = parser.parse( '60( [3 5],8 )' )
 //
 //     assert.deepEqual( group, result )
-//   })
+//   });
+//
+//
+//   it( 'should generate a euclidean rhythm with a group determining pulses', () => {
+//     const group ={
+//       value: { type:'number', value:60 },
+//       pulses:{
+//         '0': { type:'number', value:3 },
+//         '1/2': { type:'number', value:5 },
+//       },
+//       slots: { type:'number', value:8  },
+//       type:  'euclid'
+//     }
+//
+//     const result = parser.parse( '60( 5,8,2 )' )
+//
+//     assert.deepEqual( group, result )
+//   });
 //
 // })

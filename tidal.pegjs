@@ -51,6 +51,9 @@ group "group" = _ '[' _ body:term+ _ ']' _ {
 
 // bjorklund
 euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term ')' _ {
+
+  if (pulses.type === 'group') delete pulses.type;
+
   return { type:'euclid', value, pulses, slots }
 }
 // avoid left-recursions
@@ -181,13 +184,28 @@ notlayer = body:(list / euclid / polymeter / group / number / word / rest / ones
 
 
 // One-step
-onestep = _ '<' _ body:notonestep+_'>'_ {
+onestep = _ '<'  _ body:(notonestep _ ',' _ )+ end:notonestep _'>'_ {
 
-  const final = []
-  final.push(body[0])
-  final.type = 'onestep'
-
-  return final
+  // let result = []
+  // result.push(body[0])
+  // result = parse(result)
+  // result.type = 'onestep'
+  //
+  // return result
+  // const concurrent = []
+  //
+  // for( let i = 0; i < body.length; i++ ) {
+  //   concurrent.push( body[ i ][ 0 ] )
+  //   concurrent[ concurrent.length - 1 ].type = 'group'
+  // }
+  //
+  // end.type = 'group'
+  // concurrent.push( end )
+  //
+  // let result = parse(concurrent)
+  // result.type = 'onestep'
+  //
+  // return result
 }
 notonestep = body:(list / euclid / polymeter / group / number / word / rest / layer) _ { return body }
 
