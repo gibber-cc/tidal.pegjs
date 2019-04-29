@@ -63,7 +63,7 @@ describe( 'Testing layers and nested layers.', () => {
       type: 'layer'
     };
 
-    const result  = parser.parse('[1 2 3, [4 5] 6, 7 8]')
+    const result  = parser.parse('[1 2 3, [4 5] 6, 7 8]')[0]
 
   });
 

@@ -67,14 +67,65 @@ notdegrade = body:( repeat / euclid / group / number / word / onestep) _ { retur
 
 // match a binary operation, a la 4*2, or [0 1]*4
 repeat = value:notrepeat _ operator:op  _ repeatValue:term {
-  return { type:'repeat', value, operator, repeatValue }
+
+  let result = {};
+  result.type = 'repeat';
+  result.operator = operator;
+  result.repeatValue = repeatValue;
+  result.value = value;
+
+  // let duration = new Fraction(1, (repeatValue.value * (Object.keys(value).length - 1)));
+  //
+  // let currentPosition = new Fraction(0);
+  //
+  // console.log(value)
+  //
+  // for (let i = 0; i < repeatValue.value; i++){
+  //
+  //   for ()
+  //
+  //   if (value.type === 'group'){
+  //     for (let entry in value){
+  //
+  //       if (entry === 'type') continue;
+  //
+  //       result[currentPosition.toFraction(false)] = entry;
+  //       currentPosition = currentPosition.add(duration);
+  //     }
+  //   }
+  //   else{
+  //     result[currentPosition.toFraction(false)] = value;
+  //     currentPosition = currentPosition.add(duration);
+  //   }
+  // }
+
+  return result;
+
+  /*
+    Use this code intstead for a result with operator, repeat value and
+    pattern to repeat instead of object with the appropriate number of repeats
+
+    //return { type:'repeat', value, operator, repeatValue }
+   */
 }
 // avoid left-recursions
 notrepeat = body:(euclid / polymeter / group / number / word / rest /onestep) _ { return body }
 
 
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
-  return { type:'polymeter', left, right }
+
+  left = parse(left)
+  left.type = 'group'
+  right = parse(right)
+  right.type = 'group'
+
+  let result = {
+    left: left,
+    right: right,
+    type: 'polymeter'
+  }
+
+  return result
 }
 
 
