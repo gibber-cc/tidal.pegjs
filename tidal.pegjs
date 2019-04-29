@@ -1,9 +1,13 @@
 {
-  // Use fraction library to specify sections within a cycle
   var Fraction = require('fraction.js');
 
-  /**Parse a body and return with fractions corresponding to location in cycles and subcycles
-  */
+    /**
+     * Parse a Tidal pattern to create an object
+     * @param   {String}   body      the Tidal pattern to be parsed
+     * @param   {Fraction} start = 0 the starting point in the cycle of the pattern
+     * @param   {Fraction} end = 0   the ending point in the cycle of the pattern
+     * @return  {Object}             the parsed object
+     */
   function parse(body, start = new Fraction(0), end = new Fraction(1)){
 
     let cycleBody = {};
@@ -16,7 +20,6 @@
     }
     return cycleBody;
   }
-
 }
 
 
@@ -26,33 +29,22 @@ pattern =  euclid / repeat / layer / group / list / onestep
 // generic term for matching in groups
 term "term" = body:(
   polymeter / layer / degrade / repeat / feet / group / euclid  / number / word / rest / onestep
-) _ {
-  // console.log(body)
-  // let array = []
-  // array.push(body)
-  // console.log(parse(array))
-  return body
-}
+) _ {return body}
 
 
 // a list (which is a group)
 list = _ body:term+ _ {
   body = parse(body)
   body.type = 'group'
-
-  //console.log("list", flatten(body))
-
   return body
 }
 
 
 // a group
 group "group" = _ '[' _ body:term+ _ ']' _ {
+  // console.log(typeof body, "in group")
   body = parse(body)
   body.type = 'group'
-
-  //console.log("group", flatten(body))
-
   return body
 }
 
@@ -94,21 +86,21 @@ rest = '~' {
 
 // identifies an array of groups delimited by '.' characters
 feet = start:foot+ end:term+ {
+
+  start = parse(start[0])
+  start.type = 'group'
+
   end = parse(end)
   end.type = 'group'
 
-  start = start[0]
-
   let result = parse([start, end])
-  //result.type='group'
-  console.log("RESULT:", result, "END OF RESULT")
+  result.type = 'group'
+
   return result
 }
 // identifies a group delimited by a '.' character
 foot = value:notfoot+ dot _ {
-  value = parse(value)
   value.type = 'group'
-  console.log("VALUE:",value[0], "END OF VALUE")
   return value
 }
 // avoid left-recursions
