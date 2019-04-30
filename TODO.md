@@ -15,13 +15,13 @@ TODO
   - Potential solution:
 
 - [ ] Write parse task in Gulp:
-  - [ x ] Add files to dist folder:
+  - [x] Add files to dist folder:
     - Concatenated tidal.js and parseToObject.js files into one file
     - The tidal.pegjs file
   - [ ] Change the parseFile path in the tidal.pegjs file to look at the concatenated file
     - Look into gulp-replace to replace the string with the path
     - Figure out how to find the path to the concatenated file
-  - [ x ] Add test folder to the dist folder (without the flatten test)
+  - [x] Add test folder to the dist folder (without the flatten test)
   - [ ] For each file in the test file change the path for grammar to be the concatenated file
   - [ ] Run all tests in the test folder using mocha
 
@@ -32,7 +32,7 @@ TODO
   - [ ] Change the parseFile path in the tidal.pegjs file to look at the concatenated file
     - Look into gulp-replace to replace the string with the path
     - Figure out how to find the path to the concatenated file
-  - [ x ] Add test folder to the dist folder
+  - [x] Add test folder to the dist folder
   - [ ] For each file in the test file:
     - Change the path for grammar to be the concatenated file
     - Change the path to flattenFile in the flatten test to be the concatenated file
