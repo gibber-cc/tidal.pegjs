@@ -4,8 +4,6 @@
  * http://pegjs.org/
  */
 
- var Fraction = require('fraction.js');
-
 (function(root) {
   "use strict";
 

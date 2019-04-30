@@ -16,8 +16,7 @@ let parseFile = require('/home/mariana0pachon/wpi/livecodeisu/tidal.pegjs/src/pa
 
 module.exports = {
 
-  parseToObject:
-    function bla(){},
+  parseToObject: parseFile.parseToObject,
 
   flatten:
     function flatten(group){
@@ -38,13 +37,9 @@ module.exports = {
 
             let length = (Object.keys(group.value).length - 1) * group.repeatValue.value;
 
-            console.log(group.value, Object.keys(group.value).length)
-
             let groupDur = new Fraction(1, length)
 
             let currentPosition = new Fraction(0);
-
-            console.log(length, groupDur);
 
               for (let i=0; i<group.repeatValue.value; i++){
                 for ( let key in group.value ){

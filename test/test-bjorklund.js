@@ -9,7 +9,7 @@ const fs     = require( 'fs' )
 const assert = require( 'assert')
 const util   = require( 'util' )
 
-const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' })
+const grammar = fs.readFileSync( __dirname + '/../src/tidal.pegjs', { encoding:'utf-8' })
 const parser  = peg.generate( grammar )
 
 describe( 'Testing Euclidean rhythms.', () => {

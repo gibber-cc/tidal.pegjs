@@ -20,17 +20,16 @@
   "author": "Charlie Roberts",
   "license": "MIT",
   "devDependencies": {
+    "gulp": "^4.0.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-mocha": "^6.0.0",
+    "gulp-replace": "^1.0.0",
+    "gulp-watch": "^5.0.1",
     "pegjs": "^0.10.0"
   },
   "dependencies": {
     "fraction.js": "^4.0.12"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mariana0pachon/tidal.pegjs.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mariana0pachon/tidal.pegjs/issues"
-  },
-  "homepage": "https://github.com/mariana0pachon/tidal.pegjs#readme"
+  }
 }
