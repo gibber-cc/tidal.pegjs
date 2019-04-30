@@ -1,5 +1,5 @@
 {
-  let parseFile = require('/home/mariana0pachon/wpi/livecodeisu/tidal.pegjs/src/parseToObject.js');
+  let parseFile = require('../../../../src/parseToObject.js');
 }
 
 pattern =  euclid / repeat / layer / group / list / onestep
