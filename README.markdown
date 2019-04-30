@@ -5,7 +5,7 @@ tidal.pegjs
 
 # Usage
 
-The easiest way to use this peg is by using Gulp. More details are at the bottom of this file
+The easiest way to use this peg is by using Gulp. More details are in the *Development* section
 
 ## Parsing example outputs
 
