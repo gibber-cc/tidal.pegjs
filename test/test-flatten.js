@@ -4,51 +4,8 @@
  *
  */
 
-var Fraction = require('fraction.js');
+let flattenFile = require('./../src/flatten.js');
 const assert = require( 'assert');
-
-
-/**
- * Flattens objects that resulted from parsing Tidal patterns
- * @param  {Object} group the nested (or not nested) object to be flattened
- * @return {Object}       the flattened object with correct fractions in a cycle
- */
-function flatten(group){
-
-  let currentPosition = new Fraction(0) // Start at 0 and increase every iteration
-  const flattened = {}
-
-  /**
-   * Recursive inner function to add proper fractions as keys to the flattened object
-   * @param  {Object}   group    the group or subgroup to be flattened
-   * @param  {Fraction} dur      the duration of each subgroup in the group
-   */
-  function calc( group, dur = new Fraction( 1, Object.keys(group).length - 1 ) ){
-
-    for( let key in group ) {
-
-      if( key === 'type' ) continue // No type specification in the flattened object
-
-      const step = group[ key ]
-
-      if( step.type === 'group' ) { // Nested step so do a recursive call
-        const groupDur = new Fraction( 1, Object.keys( step ).length - 1 )
-        calc( step, dur.mul( groupDur ) )
-      }
-      else{ // Step is flat so add to global flattened const
-        flattened[ currentPosition.toFraction( false ) ] = step
-        currentPosition = currentPosition.add( dur )
-      }
-    }
-  }
-
-  calc(group) // Call to the inner function
-
-  return flattened // Final flattened object
-
-}
-
-
 
 describe( 'Testing flatten function on parsed groups and parsed nested groups', () => {
 
@@ -68,7 +25,7 @@ describe( 'Testing flatten function on parsed groups and parsed nested groups', 
       '2/3': {type: 'number', value: 2},
     }
 
-    assert.deepEqual(flatten(group), flat)
+    assert.deepEqual(flattenFile.flatten(group), flat)
   })
 
 
@@ -94,7 +51,7 @@ describe( 'Testing flatten function on parsed groups and parsed nested groups', 
       '2/3': {type: 'number', value: 4},
     }
 
-    assert.deepEqual(flatten(group), flat)
+    assert.deepEqual(flattenFile.flatten(group), flat)
 
   })
 
@@ -132,7 +89,52 @@ describe( 'Testing flatten function on parsed groups and parsed nested groups', 
       '2/3': {type: 'number', value: '5'},
     }
 
-    assert.deepEqual(flatten(group), flat)
+    assert.deepEqual(flattenFile.flatten(group), flat)
+  });
 
-  })
+
+it('repeat type should generate the proper repetition', () => {
+
+  const group = {
+    type:'repeat',
+    operator: '*',
+    repeatValue:{ type:'number', value:2 },
+    value: {
+      '0': { type:'number', value:2 },
+      '1/2': { type:'number', value:1 },
+      type: 'group'
+    }
+  }
+
+  const flat = {
+    '0': {type: 'number', value:2},
+    '1/4': {type: 'number', value: 1},
+    '1/2': {type: 'number', value: 2},
+    '3/4': {type: 'number', value: 1},
+    type: 'group'
+  }
+
+  assert.deepEqual(flattenFile.flatten(group), flat);
+
+});
+
+
+it('repeat type should generate the proper repetition', () => {
+
+  const group = {
+    type: 'repeat',
+    operator:'*',
+    repeatValue: { type: 'number', value: 2 },
+    value: { type:'number', value:0 }
+  }
+
+  const flat = {
+    '0': {type: 'number', value:0},
+    type: 'group'
+  }
+
+  assert.deepEqual(flattenFile.flatten(group), flat);
+
+});
+
 })
