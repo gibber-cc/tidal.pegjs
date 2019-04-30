@@ -15,8 +15,7 @@ var Fraction = require('fraction.js');
  * @param   {Fraction} end = 0   the ending point in the cycle of the pattern
  * @return  {Object}             the parsed object
  */
-module.exports = {
-  parseToObject:
+module.exports.parseToObject =
     function parseToObject(body, start = new Fraction(0), end = new Fraction(1)){
 
       let cycleBody = {};
@@ -29,4 +28,3 @@ module.exports = {
       }
       return cycleBody;
     }
-}

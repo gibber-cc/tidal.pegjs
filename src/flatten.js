@@ -14,11 +14,8 @@ let parseFile = require( './parseToObject.js' );
  * @return {Object}       the flattened object with correct fractions in a cycle
  */
 
-module.exports = {
+module.exports.flatten =
 
-  parseToObject: parseFile.parseToObject,
-
-  flatten:
     function flatten(group){
 
       let currentPosition = new Fraction(0) // Start at 0 and increase every iteration
@@ -83,6 +80,4 @@ module.exports = {
       calc(group) // Call to the inner function
 
       return flattened // Final flattened object
-
     }
-}
