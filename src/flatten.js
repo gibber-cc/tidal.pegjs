@@ -6,7 +6,6 @@
  */
 
 var Fraction = require('fraction.js');
-let parseFile = require( './parseToObject.js' );
 
 /**
  * Flattens objects that resulted from parsing Tidal patterns
