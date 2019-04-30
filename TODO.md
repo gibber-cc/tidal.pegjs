@@ -12,7 +12,7 @@ TODO
 
 - [ ] Fix parseFile path in the tidal.pegjs file:
   - It cannot be relative because after being compiled the tidal.pegjs file is in the compiled folder in the node modules: node_modules/pegjs/lib/compiler/index.js
-  - Potential solution:
+  - Potential solution: use the GitHub file link...
 
 - [ ] Write parse task in Gulp:
   - [x] Add files to dist folder:
