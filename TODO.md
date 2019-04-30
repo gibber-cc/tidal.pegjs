@@ -26,7 +26,7 @@ TODO
   - [ ] Run all tests in the test folder using mocha
 
 - [ ] Write flatten task in Gulp:
-  - [ x ] Add files to dist folder:
+  - [x] Add files to dist folder:
     - Concatenated tidal.js and flatten.js files into one file
     - The tidal.pegjs file
   - [ ] Change the parseFile path in the tidal.pegjs file to look at the concatenated file
