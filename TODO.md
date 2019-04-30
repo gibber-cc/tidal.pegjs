@@ -10,34 +10,20 @@ TODO
   - The input for onestep could be something incorrect like: '<1 2 3> 1 2 3>' and be parsed as '<1 2 3, 1 2 3>'
   - Potential solution: figure out how to write conditions for the syntax: if ',' we can have more things, if ')' nothing else can come after
 
-- [ ] Fix parseFile path in the tidal.pegjs file:
-  - It cannot be relative because after being compiled the tidal.pegjs file is in the compiled folder in the node modules: node_modules/pegjs/lib/compiler/index.js
-  - Potential solution: use the GitHub file link...
 
-- [ ] Write parse task in Gulp:
-  - [x] Add files to dist folder:
-    - Concatenated tidal.js and parseToObject.js files into one file
-    - The tidal.pegjs file
-  - [ ] Change the parseFile path in the tidal.pegjs file to look at the concatenated file
-    - Look into gulp-replace to replace the string with the path
-    - Figure out how to find the path to the concatenated file
-  - [x] Add test folder to the dist folder (without the flatten test)
-  - [ ] For each file in the test file change the path for grammar to be the concatenated file
-  - [ ] Run all tests in the test folder using mocha
 
-- [ ] Write flatten task in Gulp:
-  - [x] Add files to dist folder:
-    - Concatenated tidal.js and flatten.js files into one file
-    - The tidal.pegjs file
-  - [ ] Change the parseFile path in the tidal.pegjs file to look at the concatenated file
-    - Look into gulp-replace to replace the string with the path
-    - Figure out how to find the path to the concatenated file
-  - [x] Add test folder to the dist folder
-  - [ ] For each file in the test file:
-    - Change the path for grammar to be the concatenated file
-    - Change the path to flattenFile in the flatten test to be the concatenated file
-  - [ ] Run all tests in the test folder using mocha
+- Gulp logic makes sense but the way files are distributed originally does not, especially because I refer to things differently
 
-- [ ] Write watch task in Gulp:
-  - For any change in the flatten file run the flatten task
-  - For any other change run the parse task
+
+
+  test
+    - run tests
+
+  watch
+    - whenever tidal.pegjs changes or
+      flatten.js changes, run gulp flatten
+
+
+  if the PEG changes, run gulp.series( parser, flatten, test )
+  if flatten.js changes, run gulp.series( flatten, test )
+  if tests change, run test

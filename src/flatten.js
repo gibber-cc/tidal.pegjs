@@ -6,7 +6,7 @@
  */
 
 var Fraction = require('fraction.js');
-let parseFile = require('/home/mariana0pachon/wpi/livecodeisu/tidal.pegjs/src/parseToObject.js');
+let parseFile = require( './parseToObject.js' );
 
 /**
  * Flattens objects that resulted from parsing Tidal patterns
