@@ -1,44 +1,27 @@
 /* test-rest.js
  *
- * A test for rests in Tidal 
+ * A test for rests in Tidal
  *
  */
 
-const peg    = require( 'pegjs' )
-const fs     = require( 'fs' )
 const assert = require( 'assert')
+const parser = require('../dist/tidal.js')
 
-const grammar = fs.readFileSync( __dirname + '/../tidal.pegjs', { encoding:'utf-8' }) 
-const parser  = peg.generate( grammar )
+describe( 'Testing rests.', () => {
 
-describe( 'Testing rests.', () => { 
-  /*
-   * "0 ~ 2 ~"
-   *
-   * ->
-   *
-   *  [
-   *    { type:'number', value:0 },
-   *    { type:'rest' },
-   *    { type:'number', value:2 },
-   *    { type:'rest' }
-   *    type:'pattern'
-   *  ]
-   *
-   */
 
   it( 'should generate a rest object when parsing a ~', () => {
-    const pattern = [
-      { type:'number', value:0 },
-      { type:'rest' },
-      { type:'number', value:2 },
-      { type:'rest' },
-    ]
-    pattern.type  = 'pattern'
+    const expected = {
+      '0': { type:'number', value:0 },
+      '1/4': { type:'rest' },
+      '1/2': { type:'number', value:2 },
+      '3/4': { type:'rest' },
+    }
+    expected.type  = 'group'
 
     const result = parser.parse( '0 ~ 2 ~' )
 
-    assert.deepEqual( pattern, result )
+    assert.deepEqual( result, expected )
   })
 
 })

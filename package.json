@@ -2,7 +2,7 @@
   "name": "tidal.pegjs",
   "version": "1.0.0",
   "description": "A parsing expression grammar for the Tidal pattern language.",
-  "main": "tidal.js",
+  "main": "dist/*",
   "directories": {
     "test": "test"
   },
@@ -17,9 +17,19 @@
     "music",
     "tidalcycles"
   ],
-  "author": "Charlie Roberts",
+  "authors": "Charlie Roberts & Mariana Pachon-Puentes",
   "license": "MIT",
   "devDependencies": {
+    "gulp": "^4.0.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-mocha": "^6.0.0",
+    "gulp-pegjs": "^0.1.0",
+    "gulp-watch": "^5.0.1",
     "pegjs": "^0.10.0"
+  },
+  "dependencies": {
+    "fraction.js": "^4.0.12"
   }
 }
