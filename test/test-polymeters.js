@@ -17,13 +17,8 @@
   d1 $ sound "{arpy bass2 drum notes can, bd hh sn cp}""
 */
 
-const peg    = require( 'pegjs' )
-const fs     = require( 'fs' )
 const assert = require( 'assert')
-const util   = require( 'util' )
-
-const grammar = fs.readFileSync( __dirname + '/../src/tidal.pegjs', { encoding:'utf-8' })
-const parser  = peg.generate( grammar )
+const parser = require('../dist/tidal.js')
 
 describe('Testing polymeters', () => {
 

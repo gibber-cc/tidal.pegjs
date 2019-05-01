@@ -1,5 +1,18 @@
 {
-  let parseFile = require('../../../../dist/peg-parse.js');
+  var Fraction = require('fraction.js');
+
+  function parseToObject(body, start = new Fraction(0), end = new Fraction(1)){
+
+    let cycleBody = {};
+    let cycleSection = start;
+    let frac = new Fraction(end/body.length);
+
+    for( let i = 0; i < body.length; i++ ) {
+      cycleBody[cycleSection.toFraction(false)] = body[i];
+      cycleSection = new Fraction(cycleSection).add(frac);
+    }
+    return cycleBody;
+  }
 }
 
 pattern =  euclid / repeat / layer / group / list / onestep
@@ -13,7 +26,7 @@ term "term" = body:(
 
 // a list (which is a group)
 list = _ body:term+ _ {
-  body = parseFile.parseToObject(body)
+  body = parseToObject(body)
   body.type = 'group'
   return body
 }
@@ -22,7 +35,7 @@ list = _ body:term+ _ {
 // a group
 group "group" = _ '[' _ body:term+ _ ']' _ {
   // console.log(typeof body, "in group")
-  body = parseFile.parseToObject(body)
+  body = parseToObject(body)
   body.type = 'group'
   return body
 }
@@ -64,9 +77,9 @@ notrepeat = body:(euclid / polymeter / group / number / word / rest /onestep) _ 
 
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
 
-  left = parseFile.parseToObject(left)
+  left = parseToObject(left)
   left.type = 'group'
-  right = parseFile.parseToObject(right)
+  right = parseToObject(right)
   right.type = 'group'
 
   let result = {
@@ -88,13 +101,13 @@ rest = '~' {
 // identifies an array of groups delimited by '.' characters
 feet = start:foot+ end:term+ {
 
-  start = parseFile.parseToObject(start[0])
+  start = parseToObject(start[0])
   start.type = 'group'
 
-  end = parseFile.parseToObject(end)
+  end = parseToObject(end)
   end.type = 'group'
 
-  let result = parseFile.parseToObject([start, end])
+  let result = parseToObject([start, end])
   result.type = 'group'
 
   return result
@@ -122,7 +135,7 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
   end.type = 'group'
   concurrent.push( end )
 
-  let result = parseFile.parseToObject(concurrent)
+  let result = parseToObject(concurrent)
   result.type = 'layer'
 
   return result
@@ -146,7 +159,7 @@ onestep = _ '<'  _ body:(notonestep _ ','? _ )+ end:notonestep? _'>'_ {
   }
 
 
-  let result = parseFile.parseToObject(concurrent)
+  let result = parseToObject(concurrent)
   result.type = 'onestep'
 
   return result
