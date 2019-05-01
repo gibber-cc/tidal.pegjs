@@ -4,7 +4,7 @@
  *
  */
 
-let flattenFile = require('./../src/flatten.js');
+let flattenFile = require('./../dist/peg-parse-flatten.js');
 const assert = require( 'assert');
 
 describe( 'Testing flatten function on parsed groups and parsed nested groups', () => {
@@ -130,6 +130,7 @@ it('repeat type should generate the proper repetition', () => {
 
   const flat = {
     '0': {type: 'number', value:0},
+    '1/2': {type: 'number', value: 0},
     type: 'group'
   }
 

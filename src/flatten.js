@@ -26,38 +26,6 @@ module.exports.flatten =
      */
     function calc( group, dur = new Fraction( 1, Object.keys(group).length - 1 ) ){
 
-      if (group.type === 'repeat'){
-
-        if (group.value.type === 'group'){
-
-          let length = (Object.keys(group.value).length - 1) * group.repeatValue.value;
-
-          let groupDur = new Fraction(1, length)
-
-          let currentPosition = new Fraction(0);
-
-            for (let i=0; i<group.repeatValue.value; i++){
-              for ( let key in group.value ){
-
-                if (key === 'type') continue
-
-                const step = group.value[key]
-
-                flattened[currentPosition.toFraction(false)] = step;
-                currentPosition = currentPosition.add(groupDur);
-              }
-            }
-        }
-        else {
-          flattened[currentPosition.toFraction(false)] = group.value;
-        }
-
-        flattened.type = 'group';
-
-        return;
-
-      }
-
       for( let key in group ) {
 
         if( key === 'type' ) continue // No type specification in the flattened object
@@ -75,7 +43,28 @@ module.exports.flatten =
       }
     }
 
-    calc(group) // Call to the inner function
+
+
+    if (group.type === 'repeat'){
+
+      let length = (Object.keys(group.value).length - 1) * group.repeatValue.value;
+      let groupDur = new Fraction(1, length);
+
+      if (group.value.type != 'group'){
+        group.value = {'0': group.value}
+      }
+
+      for (var i = 0; i<group.repeatValue.value; i++){
+        calc(group.value, groupDur);
+        currentPosition = currentPosition.add(groupDur.mul(new Fraction(i)));
+      }
+
+      flattened.type = 'group';
+    }
+
+    else{
+      calc(group) // Call to the inner function
+    }
 
     return flattened // Final flattened object
   }

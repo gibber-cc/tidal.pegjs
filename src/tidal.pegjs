@@ -1,5 +1,5 @@
 {
-  let parseFile = require('../../../../src/parseToObject.js');
+  let parseFile = require('../../../../dist/peg-parse.js');
 }
 
 pattern =  euclid / repeat / layer / group / list / onestep
