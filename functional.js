@@ -143,12 +143,12 @@ const calculateDuration = ( phase, phaseIncr, end ) => phase + phaseIncr <= end 
 
 // if an event is found that represents a pattern (as opposed to a constant) this function
 // is called to query the pattern and map any generated events to the appropriate timespan
-const processPattern = ( pattern, duration, phase, phaseIncr, override = null ) => {
+const processPattern = ( pattern, duration, phase, phaseIncr, override = null, shouldRemapArcs=true ) => {
   const patternFunc = Array.isArray( pattern ) ? queryArc : handlers[ pattern.type ]
-  const patternEvents = patternFunc( [], pattern, phase, duration.div( phaseIncr ), override, false )
+  const patternEvents = patternFunc( [], pattern, phase.clone(), duration.div( phaseIncr ), override, false )
   const mappedPatternEvents = patternEvents.map( v => ({
     value: v.value,
-    arc: getMappedArc( v.arc, phase.clone(), phaseIncr )
+    arc: shouldRemapArcs === true ? getMappedArc( v.arc, phase.clone(), phaseIncr ) : v.arc
   }) )
 
   return mappedPatternEvents
@@ -168,19 +168,23 @@ const getIndex = ( pattern, phase ) => {
   return idx
 }
 
+const shouldNotRemap = ['polymeter']
+const shouldRemap = pattern => shouldNotRemap.indexOf( pattern.type ) === -1
+
 const handlers = {
   polymeter( state, pattern, phase, duration ) {
     const incr  = Fraction( 1, pattern.left.length )
-    const left  = processPattern( pattern.left,duration, phase, Fraction(1,pattern.left.length ), incr )
+    const left  = processPattern( pattern.left, duration, phase.clone(), Fraction(1,pattern.left.length ), incr, false )
 
     pattern.right.options = { overrideIncr: true, incr }
-    const right = processPattern( pattern.right, duration, phase, Fraction(1,pattern.left.length ), incr )
+    const right = processPattern( pattern.right, duration, phase.clone(), Fraction(1,pattern.left.length ), incr, false )
 
     return state.concat( left ).concat( right )
   },
 }
 
-const queryArc = function( state, pattern, phase, duration, overrideIncr=null, init=true ) {
+const polymeter = function( state, pattern, phase, duration, overrideIncr=null, init=true ) {
+  phase = phase.clone()
   const start     = phase.clone(),
         end       = start.add( duration ),
         phaseIncr = overrideIncr === null ? Fraction( 1, pattern.length ) : overrideIncr
@@ -198,7 +202,41 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
     // if value is not a constant (if it's a pattern)...
     if( isNaN( value ) ) {
       // query the pattern and remap time values appropriately 
-      const events = processPattern( value, dur, phase, phaseIncr )
+      const events = processPattern( value, dur, phase.clone(), phaseIncr, null, shouldRemap( value ) )
+      state = state.concat( events )
+    }else{
+      state.push({ 
+        value, 
+        arc:Arc( phase, phase.add( dur ) ) 
+      })
+    }
+
+    phase = advancePhase( phase, phaseIncr, end )
+  }
+
+  return state
+}
+
+const queryArc = function( state, pattern, phase, duration, overrideIncr=null, init=true ) {
+  phase = phase.clone()
+  const start     = phase.clone(),
+        end       = start.add( duration ),
+        phaseIncr = overrideIncr === null ? Fraction( 1, pattern.length ) : overrideIncr
+        
+  // get phase offset if scheduling begins in middle of event arc
+  if( init === true ) phase = adjustPhase( phase, phaseIncr, end )
+
+  while( phase.compare( end ) < 0 ) {
+    const idx   = getIndex( pattern, phase ) 
+    const value = pattern[ idx.valueOf() ]
+
+    // get duration of current event being processed
+    const dur   = calculateDuration( phase, phaseIncr, end )
+
+    // if value is not a constant (if it's a pattern)...
+    if( isNaN( value ) ) {
+      // query the pattern and remap time values appropriately 
+      const events = processPattern( value, dur, phase.clone(), phaseIncr, null, shouldRemap( value ) )
       state = state.concat( events )
     }else{
       state.push({ 
