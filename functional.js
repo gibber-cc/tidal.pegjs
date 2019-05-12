@@ -145,7 +145,14 @@ const calculateDuration = ( phase, phaseIncr, end ) => phase + phaseIncr <= end 
 // is called to query the pattern and map any generated events to the appropriate timespan
 const processPattern = ( pattern, duration, phase, phaseIncr, override = null, shouldRemapArcs=true ) => {
   const patternFunc = Array.isArray( pattern ) ? queryArc : handlers[ pattern.type ]
-  const patternEvents = patternFunc( [], pattern, phase.clone(), duration.div( phaseIncr ), override, false )
+  const patternEvents = patternFunc( 
+    [], 
+    pattern, 
+    shouldReset( pattern ) === true ? Fraction(0) : phase.clone(), 
+    duration.div( phaseIncr ), 
+    override, 
+    false
+  )
   const mappedPatternEvents = patternEvents.map( v => ({
     value: v.value,
     arc: shouldRemapArcs === true ? getMappedArc( v.arc, phase.clone(), phaseIncr ) : v.arc
@@ -168,11 +175,16 @@ const getIndex = ( pattern, phase ) => {
   return idx
 }
 
+const shouldNotResetPhase = ['polymeter']
+// XXX does these need to look at all parents recursively? Right now we're only using one generation...
+const shouldReset = pattern => shouldNotResetPhase.indexOf( pattern.type ) === -1 && shouldNotResetPhase.indexOf( pattern.parent.type ) === -1
 const shouldNotRemap = ['polymeter']
 const shouldRemap = pattern => shouldNotRemap.indexOf( pattern.type ) === -1
 
 const handlers = {
   polymeter( state, pattern, phase, duration ) {
+    pattern.left.parent = pattern.right.parent = pattern
+
     const incr  = Fraction( 1, pattern.left.length )
     const left  = processPattern( pattern.left, duration, phase.clone(), Fraction(1,pattern.left.length ), incr, false )
 
@@ -227,7 +239,6 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
   if( init === true ) phase = adjustPhase( phase, phaseIncr, end )
 
   while( phase.compare( end ) < 0 ) {
-    console.log( phase.toFraction() )
     const idx   = getIndex( pattern, phase ) 
     const value = pattern[ idx.valueOf() ]
 
@@ -237,6 +248,7 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
     // if value is not a constant (if it's a pattern)...
     if( isNaN( value ) ) {
       // query the pattern and remap time values appropriately 
+      value.parent = pattern
       const events = processPattern( value, dur, phase.clone(), phaseIncr, null, shouldRemap( value ) )
       state = state.concat( events )
     }else{
@@ -261,8 +273,10 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
 //const list = makeList( [ 0, makeList([1,2]), 3 ] )
 //const events = list( [], Fraction(0), Fraction(3.1) )
 
-//const events = queryArc( [], [{ type:'polymeter', left:[0], right:[1,2,3] }], Fraction(0), Fraction(4) )
-const events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
+const events = queryArc( [], [{ type:'polymeter', left:[0], right:[1,2,3] }], Fraction(0), Fraction(4) )
+//const events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
+//const events = queryArc( [], [0,[1,2,[3,4]]], Fraction(0), Fraction(1) )
+
 
 const queue = new PQ({
   comparator: ( a,b ) => b.arc.start.compare( a.arc.start ) 
