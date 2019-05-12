@@ -227,6 +227,7 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
   if( init === true ) phase = adjustPhase( phase, phaseIncr, end )
 
   while( phase.compare( end ) < 0 ) {
+    console.log( phase.toFraction() )
     const idx   = getIndex( pattern, phase ) 
     const value = pattern[ idx.valueOf() ]
 
