@@ -3,45 +3,13 @@ const PQ       = require( 'priorityqueue' )
 const util     = require( 'util' )
 log = util.inspect
 
-const makeFast = function( pattern, speed ) {
-
-  const fast = function( state, duration ) {
-    // increase duration to grab more events, and then
-    // map to faster speed / shorter duration
-    const dur = Fraction( duration ).mul( speed )
-
-    const __state = pattern( [], dur ).map( v => {
-      const obj = {
-        time:v.time.div( speed ),
-        value:v.value
-      }
-      
-      return obj
-    })
-
-    return state.concat( __state )
-  }
-
-  return fast
-}
-
 // placeholder for potentially adding more goodies (parent arc etc.) later
 const Arc = ( start, end ) => ({ start, end })
-
-// if initial phase is in the middle of an arc, advance to the end by calculating the difference
-// between the current phase and the start of the next arc, and increasing phase accordingly.
-const adjustPhase = ( phase, phaseIncr, end ) => phase.valueOf() === 0 
-  ? Fraction(0) 
-  : phase.sub( phase.mod( phaseIncr ) )
-
-// check to see if phase should advance to next event, or, if next event is too far in the future, to the
-// end of the current duration being requested.
-const advancePhase = ( phase, phaseIncr, end ) => phase + phaseIncr <= end ? phase.add( phaseIncr ) : end 
 
 // map arc time values to appropriate durations
 const getMappedArc = ( arc, phase, phaseIncr ) => {
   let mappedArc
-  debugger
+  
   if( phase.mod( phaseIncr ).valueOf() !== 0 ) {
     mappedArc = Arc( 
       arc.start.mul( phaseIncr ).add( phase ), 
@@ -53,43 +21,24 @@ const getMappedArc = ( arc, phase, phaseIncr ) => {
       arc.end.mul( phaseIncr ).add( phase ) 
     )
   }
-  //console.log( 'mappedArc:', log(mappedArc) )
+  
   return mappedArc
 }
+
+// if initial phase is in the middle of an arc, advance to the end by calculating the difference
+// between the current phase and the start of the next arc, and increasing phase accordingly.
+const adjustPhase = ( phase, phaseIncr, end ) => phase.valueOf() === 0 
+  ? Fraction(0) 
+  : phase.sub( phase.mod( phaseIncr ) )
+
+// check to see if phase should advance to next event, or, if next event is too far in the future, to the
+// end of the current duration being requested.
+const advancePhase = ( phase, phaseIncr, end ) => phase + phaseIncr <= end ? phase.add( phaseIncr ) : end 
 
 // calculate the duration of the current event being processed.
 const calculateDuration = ( phase, phaseIncr, end ) => phaseIncr//phase + phaseIncr <= end ? phaseIncr : end.sub( phase )
 
-const getPattern = obj => {
-  if( obj.values !== undefined ) obj = obj.values
-  return obj
-}
-
-// if an event is found that represents a pattern (as opposed to a constant) this function
-// is called to query the pattern and map any generated events to the appropriate timespan
-const processPattern = ( pattern, duration, phase, phaseIncr, override = null, shouldRemapArcs=true ) => {
-  const patternFunc = Array.isArray( pattern ) ? queryArc : handlers[ pattern.type ]
-
-  const patternEvents = patternFunc( 
-    [], 
-    pattern, 
-    shouldReset( pattern ) === true ? Fraction(0) : phase.clone(), 
-    duration.div( phaseIncr ), 
-    override, 
-    false
-  )
-
-  //console.log( 'pe:', log( patternEvents, false, null, true ) )
-
-  const mapped = patternEvents.map( v => ({
-    value: v.value,
-    arc: shouldRemapArcs === true ? getMappedArc( v.arc, phase.clone(), phaseIncr ) : v.arc,
-    triggered:v.triggered
-  }) )
-
-  return mapped
-}
-
+// get an index number for a pattern for a particular phase
 const getIndex = ( pattern, phase ) => {
   let idx = 0
   if( pattern.options !== undefined ) {
@@ -115,6 +64,31 @@ const shouldReset = pattern => {
 
 const shouldNotRemap = ['polymeter']
 const shouldRemap = pattern => shouldNotRemap.indexOf( pattern.type ) === -1
+
+// if an event is found that represents a pattern (as opposed to a constant) this function
+// is called to query the pattern and map any generated events to the appropriate timespan
+const processPattern = ( pattern, duration, phase, phaseIncr, override = null, shouldRemapArcs=true ) => {
+  const patternFunc = Array.isArray( pattern ) ? queryArc : handlers[ pattern.type ]
+
+  const patternEvents = patternFunc( 
+    [], 
+    pattern, 
+    shouldReset( pattern ) === true ? Fraction(0) : phase.clone(), 
+    duration.div( phaseIncr ), 
+    override, 
+    false
+  )
+
+  // if needed, remap arcs for events
+  const mapped = patternEvents.map( v => ({
+    value: v.value,
+    arc: shouldRemapArcs === true ? getMappedArc( v.arc, phase.clone(), phaseIncr ) : v.arc,
+    triggered:v.triggered
+  }) )
+
+  return mapped
+}
+
 
 const handlers = {
   polymeter( state, pattern, phase, duration ) {
@@ -151,7 +125,7 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
   if( init === true ) phase = adjustPhase( phase, phaseIncr, end )
 
   // round up duration, we'll discard events outside of the current arc
-  // at the end of this function (queryArc)
+  // at the end of this function
   duration = Fraction( Math.ceil( duration.valueOf() ) )
 
   while( phase.compare( end ) < 0 ) {
@@ -188,8 +162,6 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
       // advance phase to next phase increment
       phase = phase.add( phaseIncr.sub( phase.mod( phaseIncr ) ) ) 
     }
-
-    //console.log( 'phase:', phase.toFraction(),  phaseIncr.toFraction() )
   }
 
   // prune any events that fall before our start phase or after our end phase
@@ -200,10 +172,10 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
   return state
 }
 
-const fp = {
+const fastpattern = {
   values:[ 2,3 ],
   type: 'fast',
-  speed: 4
+  speed: 16
 }
 
 let events
@@ -211,7 +183,7 @@ let events
 //events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
 //events = queryArc( [], [ 0, [ 1,2, [3,4] ] ], Fraction(0), Fraction(1) )
 //events = queryArc( [], { type:'polymeter', left:[0], right:[1,2,3] }, Fraction(0), Fraction(4) )
-events = queryArc( [], [0,1,fp], Fraction(.5), Fraction(1) )
+events = queryArc( [], [0,1,fastpattern], Fraction(.5), Fraction(1) )
 
 // starting at non-0 value
 //events = queryArc( [], [0,[1,2]], Fraction(.25), Fraction(1) )
