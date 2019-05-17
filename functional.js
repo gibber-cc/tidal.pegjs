@@ -1,5 +1,7 @@
 const Fraction = require( 'fraction.js' )
 const PQ       = require( 'priorityqueue' )
+const util     = require( 'util' )
+log = util.inspect
 
 const makeFast = function( pattern, speed ) {
 
@@ -23,25 +25,40 @@ const makeFast = function( pattern, speed ) {
   return fast
 }
 
-
 // placeholder for potentially adding more goodies (parent arc etc.) later
 const Arc = ( start, end ) => ({ start, end })
 
 // if initial phase is in the middle of an arc, advance to the end by calculating the difference
 // between the current phase and the start of the next arc, and increasing phase accordingly.
-const adjustPhase = ( phase, phaseIncr, end ) => phase.valueOf() === 0 ? Fraction(0) : phase.add( phaseIncr.sub( phase.mod( phaseIncr ) ) )
+const adjustPhase = ( phase, phaseIncr, end ) => phase.valueOf() === 0 
+  ? Fraction(0) 
+  : phase.sub( phase.mod( phaseIncr ) )
 
 // check to see if phase should advance to next event, or, if next event is too far in the future, to the
 // end of the current duration being requested.
-const advancePhase = ( phase, phaseIncr, end )   => phase + phaseIncr <= end ? phase.add( phaseIncr ) : end 
+const advancePhase = ( phase, phaseIncr, end ) => phase + phaseIncr <= end ? phase.add( phaseIncr ) : end 
 
 // map arc time values to appropriate durations
 const getMappedArc = ( arc, phase, phaseIncr ) => {
-  return Arc( arc.start.mul( phaseIncr ).add( phase ), arc.end.mul( phaseIncr ).add( phase ) )
+  let mappedArc
+  debugger
+  if( phase.mod( phaseIncr ).valueOf() !== 0 ) {
+    mappedArc = Arc( 
+      arc.start.mul( phaseIncr ).add( phase ), 
+      arc.end.mul( phaseIncr ).add( phaseIncr.mod( phase ) ) 
+    )
+  }else{
+    mappedArc = Arc( 
+      arc.start.mul( phaseIncr ).add( phase ), 
+      arc.end.mul( phaseIncr ).add( phase ) 
+    )
+  }
+  //console.log( 'mappedArc:', log(mappedArc) )
+  return mappedArc
 }
 
 // calculate the duration of the current event being processed.
-const calculateDuration = ( phase, phaseIncr, end ) => phase + phaseIncr <= end ? phaseIncr : end.sub( phase )
+const calculateDuration = ( phase, phaseIncr, end ) => phaseIncr//phase + phaseIncr <= end ? phaseIncr : end.sub( phase )
 
 const getPattern = obj => {
   if( obj.values !== undefined ) obj = obj.values
@@ -61,12 +78,16 @@ const processPattern = ( pattern, duration, phase, phaseIncr, override = null, s
     override, 
     false
   )
-  .map( v => ({
+
+  //console.log( 'pe:', log( patternEvents, false, null, true ) )
+
+  const mapped = patternEvents.map( v => ({
     value: v.value,
-    arc: shouldRemapArcs === true ? getMappedArc( v.arc, phase.clone(), phaseIncr ) : v.arc
+    arc: shouldRemapArcs === true ? getMappedArc( v.arc, phase.clone(), phaseIncr ) : v.arc,
+    triggered:v.triggered
   }) )
 
-  return patternEvents 
+  return mapped
 }
 
 const getIndex = ( pattern, phase ) => {
@@ -113,7 +134,8 @@ const handlers = {
     const eventsSlow = processPattern( pattern.values, fastDuration, phase.clone(), Fraction(1,pattern.length) )
     const events = eventsSlow.map( evt => ({
       value:evt.value,
-      arc:Arc( evt.arc.start.div( pattern.speed ), evt.arc.end.div( pattern.speed ) )
+      arc:Arc( evt.arc.start.div( pattern.speed ), evt.arc.end.div( pattern.speed ) ),
+      triggered:evt.triggered
     }) )
 
     return state.concat( events )
@@ -128,6 +150,10 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
   // get phase offset if scheduling begins in middle of event arc
   if( init === true ) phase = adjustPhase( phase, phaseIncr, end )
 
+  // round up duration, we'll discard events outside of the current arc
+  // at the end of this function (queryArc)
+  duration = Fraction( Math.ceil( duration.valueOf() ) )
+
   while( phase.compare( end ) < 0 ) {
     let value
 
@@ -140,7 +166,7 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
     }
 
     // get duration of current event being processed
-    const dur   = calculateDuration( phase, phaseIncr, end )
+    const dur = calculateDuration( phase, phaseIncr, end )
 
     // if value is not a constant (if it's a pattern)...
     if( isNaN( value ) ) {
@@ -151,41 +177,53 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
     }else{
       state.push({ 
         value, 
-        arc:Arc( phase, phase.add( dur ) ) 
+        arc:Arc( phase, phase.add( dur ) ),
+        triggered:true 
       })
     }
 
-    phase = advancePhase( phase, phaseIncr, end )
+    if( phase.mod( phaseIncr ).valueOf() === 0 ) {
+      phase = advancePhase( phase, phaseIncr, end )
+    }else{
+      // advance phase to next phase increment
+      phase = phase.add( phaseIncr.sub( phase.mod( phaseIncr ) ) ) 
+    }
+
+    //console.log( 'phase:', phase.toFraction(),  phaseIncr.toFraction() )
   }
+
+  // prune any events that fall before our start phase or after our end phase
+  state = state.filter( evt => {
+    return evt.arc.start.valueOf() >= start.valueOf() && evt.arc.start.valueOf() <= end.valueOf()
+  })
+
   return state
 }
-
-// simulates '8 0 {0 1, 2 3 4}*2'
-//const pm   = makePolymeter({ left:[0,1], right:[2,3,4] })
-//const list = makeList( [ 8,9, makeFast( pm, 2 )  ] )
-//const list = makeList( [ 8,9, pm  ] )
-//const list = makeList([ 0,1,2,3 ])
-
-//const list = makeList( [ 0, makeList([1,2]), 3 ] )
-//const events = list( [], Fraction(0), Fraction(3.1) )
-
-let events
-
-//events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
-//events = queryArc( [], [0,[1,2,[3,4]]], Fraction(0), Fraction(1) )
-//events = queryArc( [], { type:'polymeter', left:[0], right:[1,2,3] }, Fraction(0), Fraction(4) )
 
 const fp = {
   values:[ 2,3 ],
   type: 'fast',
-  speed: 16
+  speed: 4
 }
 
-events = queryArc( [], fp, Fraction(0), Fraction(1,2) )
+let events
+
+//events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
+//events = queryArc( [], [ 0, [ 1,2, [3,4] ] ], Fraction(0), Fraction(1) )
+//events = queryArc( [], { type:'polymeter', left:[0], right:[1,2,3] }, Fraction(0), Fraction(4) )
+events = queryArc( [], [0,1,fp], Fraction(.5), Fraction(1) )
+
+// starting at non-0 value
+//events = queryArc( [], [0,[1,2]], Fraction(.25), Fraction(1) )
 
 const queue = new PQ({
   comparator: ( a,b ) => b.arc.start.compare( a.arc.start ) 
 })
 
 queue.from( events )
-queue.collection.forEach( v => console.log( `${v.arc.start.toFraction()}-${v.arc.end.toFraction()}: [ ${v.value.toString()} ]` ) )
+
+queue.collection.forEach( v => 
+  console.log( 
+    `${v.arc.start.toFraction()}-${v.arc.end.toFraction()}: [ ${v.value.toString()} ] ${v.triggered}` 
+  ) 
+)
