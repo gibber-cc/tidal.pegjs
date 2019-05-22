@@ -53,7 +53,7 @@ const getIndex = ( pattern, phase ) => {
   return idx
 }
 
-const shouldNotResetPhase = ['polymeter']
+const shouldNotResetPhase = [ 'polymeter' ]
 // XXX does these need to look at all parents recursively? Right now we're only using one generation...
 const shouldReset = pattern => {
   const reset = shouldNotResetPhase.indexOf( pattern.type ) === -1 
@@ -103,15 +103,44 @@ const handlers = {
     return state.concat( left ).concat( right )
   },
 
-  fast( state, pattern, phase, duration ) {
-    const fastDuration = duration.mul( pattern.speed )
-    const eventsSlow = processPattern( pattern.values, fastDuration, phase.clone(), Fraction(1,pattern.length) )
-    const events = eventsSlow.map( evt => ({
-      value:evt.value,
-      arc:Arc( evt.arc.start.div( pattern.speed ), evt.arc.end.div( pattern.speed ) ),
-      triggered:evt.triggered
-    }) )
+  repetition( state, pattern, phase, duration ) {
+    const speeds = queryArc( [], pattern.speed, Fraction(0), Fraction(1) )
+    // the general process of increasing the speed of a pattern is to query
+    // for a longer duration according to the speed, and the scale the resulting
+    // events.
+    
+    // following explanation from yaxu for how subpatterns work with rates...
+    // https://talk.lurk.org/channel/tidal?msg=z5ck73H9EvxQwMqq6 
+    // re: pattern a*[2 4 8]
+    // "Anyway what happens in this kind of situation is that it splits the cycle in three, 
+    // each a window on what would have happened if you'd have sped things up by the given number
+    // so for the first third you'd get a third of two a's
+    // for the second third you'd get the second third of four a's..."
+    
+    let events = []
+    const incr  = Fraction(1, speeds.length)
+    for( let i = 0; i < speeds.length; i++ ) {
+      const speed = speeds[ i ].value
 
+      events = queryArc( [],
+        pattern.values,
+        Fraction( 0 ), 
+        Fraction( speed ) // extend duration based on current speed
+      )
+      // remap events to correct time spans
+      .map( evt => {
+        evt.arc.start = evt.arc.start.div( speed )
+        evt.arc.end   = evt.arc.end.div( speed )
+        return evt
+      })
+      // remove events don't fall  in the current window
+      .filter( evt => 
+        evt.arc.start.compare( incr.mul(i) ) >= 0 && 
+        evt.arc.start.compare( incr.mul(i+1) ) <= 0 
+      )
+      // add to previous events
+      .concat( events )
+    }
     return state.concat( events )
   }
 }
@@ -173,9 +202,9 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
 }
 
 const fastpattern = {
-  values:[ 2,3 ],
-  type: 'fast',
-  speed: 16
+  values:[0,1],
+  type: 'repetition',
+  speed: [1,2,4]
 }
 
 let events
@@ -183,11 +212,13 @@ let events
 //events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
 //events = queryArc( [], [ 0, [ 1,2, [3,4] ] ], Fraction(0), Fraction(1) )
 //events = queryArc( [], { type:'polymeter', left:[0], right:[1,2,3] }, Fraction(0), Fraction(4) )
-events = queryArc( [], [0,1,fastpattern], Fraction(.5), Fraction(1) )
+//events = queryArc( [], fastpattern3, Fraction(0), Fraction(1) )
+events = queryArc( [], fastpattern, Fraction(0), Fraction(1) )
 
 // starting at non-0 value
-//events = queryArc( [], [0,[1,2]], Fraction(.25), Fraction(1) )
+//events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(.725) )
 
+//console.log( log(events,{depth:3} ) ) 
 const queue = new PQ({
   comparator: ( a,b ) => b.arc.start.compare( a.arc.start ) 
 })
