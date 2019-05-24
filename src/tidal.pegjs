@@ -1,17 +1,13 @@
 {
-  var Fraction = require('fraction.js');
 
-  function parseToObject(body, start = new Fraction(0), end = new Fraction(1)){
+  function parseToObject( body ){
+    const cycleBody = {}
 
-    let cycleBody = {};
-    let cycleSection = start;
-    let frac = new Fraction(end/body.length);
+    cycleBody.values = body
+    cycleBody.type = 'group'
 
-    for( let i = 0; i < body.length; i++ ) {
-      cycleBody[cycleSection.toFraction(false)] = body[i];
-      cycleSection = new Fraction(cycleSection).add(frac);
-    }
-    return cycleBody;
+    console.log( 'body:', body.type, body.values, body )
+    return body 
   }
 }
 
@@ -25,16 +21,18 @@ term "term" = body:(
 
 
 // a list (which is a group)
-list = _ body:term+ _ {
-  body = parseToObject(body)
-  body.type = 'group'
-  return body
+list = _ values:term+ _ {
+  const out = {
+    values,
+    type:'group'
+  } 
+  return out
 }
 
 
 // a group
 group "group" = _ '[' _ body:term+ _ ']' _ {
-  // console.log(typeof body, "in group")
+   console.log(typeof body, "in group")
   body = parseToObject(body)
   body.type = 'group'
   return body

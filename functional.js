@@ -56,7 +56,7 @@ const getIndex = ( pattern, phase ) => {
 // in addition to 'fast', phase resets are also necessary when indexing subpatterns,
 // which are currently arrays with no defined .type property, hence the inclusion of
 // undefined in the array below
-const shouldResetPhase = [ 'fast', undefined ] 
+const shouldResetPhase = [ 'fast', undefined, 'group' ] 
 
 // XXX does these need to look at all parents recursively? Right now we're only using one generation...
 const shouldReset = pattern => {
