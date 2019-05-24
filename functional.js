@@ -50,14 +50,15 @@ const getIndex = ( pattern, phase ) => {
     idx = phase.mul( Fraction( pattern.length ) ).mod( pattern.length ).floor()
   }
 
-  return idx
+  return idx.valueOf()
 }
 
-const shouldNotResetPhase = [ 'polymeter' ]
+// is 'fast' the only time this will be necessary? probably...
+const shouldResetPhase = [ 'fast' ] 
 // XXX does these need to look at all parents recursively? Right now we're only using one generation...
 const shouldReset = pattern => {
-  const reset = shouldNotResetPhase.indexOf( pattern.type ) === -1 
-  const parent = pattern.parent !== undefined && shouldNotResetPhase.indexOf( pattern.parent.type ) === -1
+  const reset = shouldResetPhase.indexOf( pattern.type ) > -1 
+  const parent = pattern.parent !== undefined && shouldResetPhase.indexOf( pattern.parent.type ) > -1
 
   return reset && parent
 }
@@ -103,7 +104,7 @@ const handlers = {
     return state.concat( left ).concat( right )
   },
 
-  repetition( state, pattern, phase, duration ) {
+  speed( state, pattern, phase, duration ) {
     const speeds = queryArc( [], pattern.speed, Fraction(0), Fraction(1) )
     // the general process of increasing the speed of a pattern is to query
     // for a longer duration according to the speed, and the scale the resulting
@@ -125,7 +126,7 @@ const handlers = {
       events = queryArc( [],
         pattern.values,
         Fraction( 0 ), 
-        Fraction( speed ) // extend duration based on current speed
+        Fraction(speed)
       )
       // remap events to correct time spans
       .map( evt => {
@@ -134,6 +135,45 @@ const handlers = {
         return evt
       })
       // remove events don't fall  in the current window
+      .filter( evt => 
+        evt.arc.start.compare( incr.mul(i) ) >= 0 && 
+        evt.arc.start.compare( incr.mul(i+1) ) < 0 
+      )
+      // add to previous events
+      .concat( events )
+    }
+    return state.concat( events )
+  },
+
+  slow( state, pattern, phase, duration ) {
+    // see 'fast' pattern type of implementation notes
+    const speeds = queryArc( [], pattern.speed, Fraction(0), Fraction(1) )
+    
+    let events = []
+    const incr  = Fraction(1, speeds.length)
+    for( let i = 0; i < speeds.length; i++ ) {
+      const speed = speeds[ i ].value
+
+      // adjust phase and duration based on speed value
+      events = queryArc( 
+        [],
+        pattern.values,
+        phase.mul( speed ),
+        duration.mul( Fraction( speed ) )
+      )
+      // remap events to correct time spans
+      .map( evt => {
+        if( evt.arc.start.valueOf() !== 0 ) {
+          // XXX I don't know why this is necessary but it gets rid of a off-by-one error
+          evt.arc.start = evt.arc.start.sub( phase.div( 1/speed ) )
+        }
+
+        // also, does the event length need to be adjusted? might as well...
+        evt.arc.end = evt.arc.end.sub( phase.div( 1/speed ) ).add( 1/speed - 1)
+
+        return evt
+      })
+      // remove events don't fall in the current window
       .filter( evt => 
         evt.arc.start.compare( incr.mul(i) ) >= 0 && 
         evt.arc.start.compare( incr.mul(i+1) ) <= 0 
@@ -145,7 +185,7 @@ const handlers = {
   }
 }
 
-const queryArc = function( state, pattern, phase, duration, overrideIncr=null, init=true ) {
+const queryArc = function( eventList, pattern, phase, duration, overrideIncr=null, init=true ) {
   const start     = phase.clone(),
         end       = start.add( duration ),
         phaseIncr = overrideIncr === null ? Fraction( 1, pattern.length ) : overrideIncr
@@ -158,33 +198,27 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
   duration = Fraction( Math.ceil( duration.valueOf() ) )
 
   while( phase.compare( end ) < 0 ) {
-    let value
-
-    // handle processing non-list patterns from top level
-    if( Array.isArray( pattern ) ) {
-      const idx = getIndex( pattern, phase ) 
-      value = pattern[ idx.valueOf() ]
-    }else{
-      value = pattern
-    }
+    // if pattern is a list, read using current phase, else read directly
+    const value = Array.isArray( pattern ) ? pattern[ getIndex( pattern, phase ) ] : pattern
 
     // get duration of current event being processed
     const dur = calculateDuration( phase, phaseIncr, end )
 
-    // if value is not a constant (if it's a pattern)...
+    // if value is not a numeric or string constant (if it's a pattern)...
     if( isNaN( value ) ) {
       // query the pattern and remap time values appropriately 
       value.parent = pattern
       const events = processPattern( value, dur, phase.clone(), phaseIncr, null, shouldRemap( value ) )
-      state = state.concat( events )
+      eventList = eventList.concat( events )
     }else{
-      state.push({ 
+      eventList.push({ 
         value, 
         arc:Arc( phase, phase.add( dur ) ),
         triggered:true 
       })
     }
 
+    // assuming we are starting / ending at a regular phase increment value...
     if( phase.mod( phaseIncr ).valueOf() === 0 ) {
       phase = advancePhase( phase, phaseIncr, end )
     }else{
@@ -194,31 +228,32 @@ const queryArc = function( state, pattern, phase, duration, overrideIncr=null, i
   }
 
   // prune any events that fall before our start phase or after our end phase
-  state = state.filter( evt => {
+  eventList = eventList.filter( evt => {
     return evt.arc.start.valueOf() >= start.valueOf() && evt.arc.start.valueOf() <= end.valueOf()
   })
 
-  return state
+  return eventList
 }
 
 const fastpattern = {
-  values:[0,1],
-  type: 'repetition',
-  speed: [1,2,4]
+  values:[0],
+  type: 'speed',
+  speed: [2,3,4,8]
 }
 
+const slowpattern = {
+  values:[0],
+  type: 'slow',
+  speed: [ Fraction(1,3) ]
+}
 let events
 
 //events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
 //events = queryArc( [], [ 0, [ 1,2, [3,4] ] ], Fraction(0), Fraction(1) )
 //events = queryArc( [], { type:'polymeter', left:[0], right:[1,2,3] }, Fraction(0), Fraction(4) )
-//events = queryArc( [], fastpattern3, Fraction(0), Fraction(1) )
 events = queryArc( [], fastpattern, Fraction(0), Fraction(1) )
+//events = queryArc( [], slowpattern, Fraction(0), Fraction(15) )
 
-// starting at non-0 value
-//events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(.725) )
-
-//console.log( log(events,{depth:3} ) ) 
 const queue = new PQ({
   comparator: ( a,b ) => b.arc.start.compare( a.arc.start ) 
 })
