@@ -1,7 +1,7 @@
 const Fraction = require( 'fraction.js' )
 const PQ       = require( 'priorityqueue' )
 const util     = require( 'util' )
-log = util.inspect
+const log      = util.inspect
 
 // placeholder for potentially adding more goodies (parent arc etc.) later
 const Arc = ( start, end ) => ({ start, end })
@@ -53,8 +53,11 @@ const getIndex = ( pattern, phase ) => {
   return idx.valueOf()
 }
 
-// is 'fast' the only time this will be necessary? probably...
-const shouldResetPhase = [ 'fast' ] 
+// in addition to 'fast', phase resets are also necessary when indexing subpatterns,
+// which are currently arrays with no defined .type property, hence the inclusion of
+// undefined in the array below
+const shouldResetPhase = [ 'fast', undefined ] 
+
 // XXX does these need to look at all parents recursively? Right now we're only using one generation...
 const shouldReset = pattern => {
   const reset = shouldResetPhase.indexOf( pattern.type ) > -1 
@@ -145,6 +148,7 @@ const handlers = {
     return state.concat( events )
   },
 
+  // doesn't appear to work for subpatterns
   slow( state, pattern, phase, duration ) {
     // see 'fast' pattern type of implementation notes
     const speeds = queryArc( [], pattern.speed, Fraction(0), Fraction(1) )
@@ -199,7 +203,9 @@ const queryArc = function( eventList, pattern, phase, duration, overrideIncr=nul
 
   while( phase.compare( end ) < 0 ) {
     // if pattern is a list, read using current phase, else read directly
-    const value = Array.isArray( pattern ) ? pattern[ getIndex( pattern, phase ) ] : pattern
+    const value = Array.isArray( pattern ) === true 
+      ? pattern[ getIndex( pattern, phase ) ] 
+      : pattern
 
     // get duration of current event being processed
     const dur = calculateDuration( phase, phaseIncr, end )
@@ -244,15 +250,18 @@ const fastpattern = {
 const slowpattern = {
   values:[0],
   type: 'slow',
-  speed: [ Fraction(1,3) ]
+  speed: [ Fraction(1,3) ] 
 }
+
 let events
 
 //events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
 //events = queryArc( [], [ 0, [ 1,2, [3,4] ] ], Fraction(0), Fraction(1) )
 //events = queryArc( [], { type:'polymeter', left:[0], right:[1,2,3] }, Fraction(0), Fraction(4) )
-events = queryArc( [], fastpattern, Fraction(0), Fraction(1) )
-//events = queryArc( [], slowpattern, Fraction(0), Fraction(15) )
+//events = queryArc( [], fastpattern, Fraction(0), Fraction(1) )
+events = queryArc( [], slowpattern, Fraction(0), Fraction(15) )
+
+//console.log( log( events, { depth:4 }) )
 
 const queue = new PQ({
   comparator: ( a,b ) => b.arc.start.compare( a.arc.start ) 
@@ -265,3 +274,4 @@ queue.collection.forEach( v =>
     `${v.arc.start.toFraction()}-${v.arc.end.toFraction()}: [ ${v.value.toString()} ] ${v.triggered}` 
   ) 
 )
+
