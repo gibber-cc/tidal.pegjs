@@ -86,8 +86,7 @@ const processPattern = ( pattern, duration, phase, phaseIncr, override = null, s
   // if needed, remap arcs for events
   const mapped = patternEvents.map( v => ({
     value: v.value,
-    arc: shouldRemapArcs === true ? getMappedArc( v.arc, phase.clone(), phaseIncr ) : v.arc,
-    triggered:v.triggered
+    arc: shouldRemapArcs === true ? getMappedArc( v.arc, phase.clone(), phaseIncr ) : v.arc
   }) )
 
   return mapped
@@ -192,7 +191,7 @@ const handlers = {
 const queryArc = function( eventList, pattern, phase, duration, overrideIncr=null, init=true ) {
   const start     = phase.clone(),
         end       = start.add( duration ),
-        phaseIncr = overrideIncr === null ? Fraction( 1, pattern.length ) : overrideIncr
+        phaseIncr = overrideIncr === null ? Fraction( 1, pattern.values.length ) : overrideIncr
         
   // get phase offset if scheduling begins in middle of event arc
   if( init === true ) phase = adjustPhase( phase, phaseIncr, end )
@@ -203,24 +202,23 @@ const queryArc = function( eventList, pattern, phase, duration, overrideIncr=nul
 
   while( phase.compare( end ) < 0 ) {
     // if pattern is a list, read using current phase, else read directly
-    const value = Array.isArray( pattern ) === true 
-      ? pattern[ getIndex( pattern, phase ) ] 
-      : pattern
+    const member = Array.isArray( pattern.values ) === true 
+      ? pattern.values[ getIndex( pattern.values, phase ) ] 
+      : pattern.value
 
     // get duration of current event being processed
     const dur = calculateDuration( phase, phaseIncr, end )
 
     // if value is not a numeric or string constant (if it's a pattern)...
-    if( isNaN( value ) ) {
+    if( isNaN( member.value ) ) {
       // query the pattern and remap time values appropriately 
-      value.parent = pattern
-      const events = processPattern( value, dur, phase.clone(), phaseIncr, null, shouldRemap( value ) )
+      member.parent = pattern
+      const events = processPattern( member, dur, phase.clone(), phaseIncr, null, shouldRemap( member ) )
       eventList = eventList.concat( events )
     }else{
       eventList.push({ 
-        value, 
+        value:member.value, 
         arc:Arc( phase, phase.add( dur ) ),
-        triggered:true 
       })
     }
 
@@ -241,37 +239,44 @@ const queryArc = function( eventList, pattern, phase, duration, overrideIncr=nul
   return eventList
 }
 
-const fastpattern = {
-  values:[0],
-  type: 'speed',
-  speed: [2,3,4,8]
-}
+//const fastpattern = {
+//  values:[0],
+//  type: 'speed',
+//  speed: [2,3,4,8]
+//}
 
-const slowpattern = {
-  values:[0],
-  type: 'slow',
-  speed: [ Fraction(1,3) ] 
-}
+//const slowpattern = {
+//  values:[0],
+//  type: 'slow',
+//  speed: [ Fraction(1,3) ] 
+//}
 
-let events
+//let events
 
 //events = queryArc( [], [0,[1,2]], Fraction(0), Fraction(1) )
 //events = queryArc( [], [ 0, [ 1,2, [3,4] ] ], Fraction(0), Fraction(1) )
 //events = queryArc( [], { type:'polymeter', left:[0], right:[1,2,3] }, Fraction(0), Fraction(4) )
 //events = queryArc( [], fastpattern, Fraction(0), Fraction(1) )
-events = queryArc( [], slowpattern, Fraction(0), Fraction(15) )
+//events = queryArc( [], slowpattern, Fraction(0), Fraction(15) )
+
+//events = queryArc( [], 
+//  { values: [ { type:'number', value:0 }, { type:'number', value:1 }], type:'group' },
+//  Fraction(0),
+//  Fraction(1)
+//)
 
 //console.log( log( events, { depth:4 }) )
 
-const queue = new PQ({
-  comparator: ( a,b ) => b.arc.start.compare( a.arc.start ) 
-})
+//const queue = new PQ({
+//  comparator: ( a,b ) => b.arc.start.compare( a.arc.start ) 
+//})
 
-queue.from( events )
+//queue.from( events )
 
-queue.collection.forEach( v => 
-  console.log( 
-    `${v.arc.start.toFraction()}-${v.arc.end.toFraction()}: [ ${v.value.toString()} ] ${v.triggered}` 
-  ) 
-)
+//queue.collection.forEach( v => 
+//  console.log( 
+//    `${v.arc.start.toFraction()}-${v.arc.end.toFraction()}: [ ${v.value.toString()} ] ${v.triggered}` 
+//  ) 
+//)
 
+module.exports = queryArc
