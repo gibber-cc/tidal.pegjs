@@ -4,14 +4,13 @@
  *
  */
 
-const assert = require( 'assert')
-const parser = require('../dist/tidal.js')
+const assert   = require( 'assert')
+const parser   = require('../dist/tidal.js')
 const queryArc = require( '../functional.js' )
 const Fraction = require( 'fraction.js' )
-const util   = require( 'util' )
+const util     = require( 'util' )
 
 describe( 'Testing simple number series groups.', () => {
-
 
   it( '"0 1 2" should parse to an array of three numbers, marked as a group.', () => {
     const expected = {
@@ -29,7 +28,6 @@ describe( 'Testing simple number series groups.', () => {
 
 
   it ('"a" should parse to an array of 1 string, marked as group.', () => {
-
     const expected = {
       values:[
         { type: 'string', value: 'a' },
@@ -42,7 +40,7 @@ describe( 'Testing simple number series groups.', () => {
     assert.deepEqual(expected, result)
   })
 
-  it( `'0 1' should schedule as two events, at 0 and 1/2`, () => {
+  it( `"0 1" should schedule as two events, at 0 and 1/2`, () => {
     const expected = [
       {
         value:0,
@@ -54,7 +52,12 @@ describe( 'Testing simple number series groups.', () => {
       }
     ]
     
-    assert.deepEqual( expected, queryArc( [], parser.parse('0 1'), Fraction(0), Fraction(1) ) )
+    const pattern = parser.parse('0 1')
+
+    assert.deepEqual( 
+      expected, 
+      queryArc( [], pattern, Fraction(0), Fraction(1) ) 
+    )
   })
 
 })
