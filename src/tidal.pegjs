@@ -11,7 +11,7 @@
   }
 }
 
-pattern =  euclid / repeat / layer / group / list / onestep
+pattern =  euclid / repeat / layer / group / list / onestep 
 
 
 // generic term for matching in groups
@@ -22,20 +22,31 @@ term "term" = body:(
 
 // a list (which is a group)
 list = _ values:term+ _ {
-  const out = {
-    values,
-    type:'group'
-  } 
+  let out
+  
+  if( values.type === undefined ) {
+    // getting nested arrays with feet...
+    out = {
+      values:Array.isArray( values[0] ) ? values[0] : values,
+      type:'group'
+    }
+  }else{
+    out = values
+    out.type = 'group'
+  }
+ 
   return out
 }
 
 
 // a group
-group "group" = _ '[' _ body:term+ _ ']' _ {
-   console.log(typeof body, "in group")
-  body = parseToObject(body)
-  body.type = 'group'
-  return body
+group "group" = _ '[' _ values:term+ _ ']' _ {
+  const out = {
+    values,
+    type:'group'
+  }
+  
+  return out 
 }
 
 
@@ -97,26 +108,33 @@ rest = '~' {
 
 
 // identifies an array of groups delimited by '.' characters
-feet = start:foot+ end:term+ {
+feet = start:foot+ end:notfoot+ {
+  const __end = {
+    values:end,
+    type:'group'
+  }
 
-  start = parseToObject(start[0])
-  start.type = 'group'
+  // some different wrangling for two feet vs. more than two feet...
+  let values = start.length > 1 ? start.slice(0) : start[0]
+  let result
+  
+  if( start.length > 1 ) {
+    result = values.map( v => ({ type: 'group', values:v }) )
+  }else{
+    result = [ { values, type:'group' } ]
+  }
+  
+  result.push( __end )
 
-  end = parseToObject(end)
-  end.type = 'group'
-
-  let result = parseToObject([start, end])
-  result.type = 'group'
-
-  return result
+  return result 
 }
 // identifies a group delimited by a '.' character
 foot = value:notfoot+ dot _ {
-  value.type = 'group'
+  //value.type = 'group'
   return value
 }
 // avoid left-recursions
-notfoot = degrade / polymeter / rest repeat / euclid / group / number / word / onestep
+notfoot = degrade / polymeter / rest / repeat / euclid / group / number / word / onestep
 
 
 // basically, get each list and push into an array while leaving out whitespace

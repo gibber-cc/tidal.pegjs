@@ -5,17 +5,18 @@
  */
 
 const assert = require( 'assert')
-const parser = require('../dist/tidal.js')
+const parser = require( '../dist/tidal.js' )
+const util   = require( 'util' )
 
 describe( 'Testing group groups and nested group groups.', () => {
-
-
   it( 'Array brackets [] should return an array marked as a group.', () => {
 
     const expected = {
-      '0': {type: 'number', value: 0},
-      '1/3': {type: 'number', value: 1},
-      '2/3': {type: 'number', value: 2},
+      values:[
+        { type: 'number', value: 0 },
+        { type: 'number', value: 1 },
+        { type: 'number', value: 2 },
+      ],
       type: 'group'
     }
 
@@ -24,76 +25,132 @@ describe( 'Testing group groups and nested group groups.', () => {
     assert.deepEqual( result, expected )
   })
 
-
   it( 'Nested brackets should return nested groups.', () => {
     const expected =
     {
-      '0': {type: 'number', value: 0},
-      '1/3': {
-        '0': {type: 'number', value: 1},
-        '1/3': {type: 'number', value: 2},
-        '2/3': {type: 'number', value: 3},
-        type: 'group'
-      },
-      '2/3': {type: 'number', value: 4},
+      values:[
+        { type: 'number', value: 0 },
+        {
+          values:[
+            { type: 'number', value: 1 },
+            { type: 'number', value: 2 },
+            { type: 'number', value: 3 },
+          ],
+          type: 'group'
+        },
+      
+        { type: 'number', value: 4 },
+      ],
       type: 'group'
     }
 
     const result = parser.parse( '0 [1 2 3] 4' )
 
     assert.deepEqual( result, expected )
-
-
   })
 
+  
 
   it( 'Nested brackets should return nested groups.', () => {
-    const expected =
-    {
-      '0': {type: 'number', value: 0},
-      '1/3': {
-        '0': {
-          '0': {type: 'number', value: 0},
-          '1/3': {type: 'number', value: 1},
-          '2/3': {type: 'number', value: 2},
-          type: 'group'
+    const expected = {
+      type:'group',
+      values:[
+        { type: 'number', value: 0 },
+        {
+          type:'group',
+          values:[
+            {
+              type:'group',
+              values:[
+                { type: 'number', value: 1 },
+                { type: 'number', value: 2 }
+              ]
+            },
+            {
+              type:'group',
+              values:[
+                { type: 'number', value: 3 },
+                { type: 'number', value: 4 }
+              ]
+            }
+          ]
         },
-        '1/2': {
-          '0': {type: 'number', value: 3},
-          '1/2': {type: 'number', value: 4},
-          type: 'group'
-        },
-        type: 'group'
-      },
-      '2/3': {type: 'number', value: 5},
-      type: 'group'
+        { type: 'number', value: 5 },
+      ]
     }
 
-    const result = parser.parse( '0 [[ 0 1 2 ] [ 3 4 ]] 5' )
+    const result = parser.parse( '0 [[ 1 2 ] [ 3 4 ]] 5' )
 
     assert.deepEqual( result, expected )
 
   })
 
 
+  // two feet needs a different test from > 2 feet due to PEG vagaries...
   it( "Marking flattened feet with '.' should divide groups into groups.", () => {
-    const expected =
-    {
-      '0': {
-        '0': {type: 'number', value: 0},
-        '1/3': {type: 'number', value: 1},
-        '2/3': {type: 'number', value: 2},
-        type: 'group'
-      },
-      '1/2': {
-        '0': {type: 'number', value: 3},
-        '1/2': {type: 'number', value: 4},
-        type: 'group'
-      },
-      type: 'group'
+    const expected = {
+      type:'group',
+      values:[
+        {
+          type:'group',
+          values:[
+            { type: 'number', value: 0 },
+            { type: 'number', value: 1 },
+            { type: 'number', value: 2 },
+          ]
+        },
+        {
+          type:'group',
+          values:[
+            { type: 'number', value: 3 },
+            { type: 'number', value: 4 }
+          ]
+        }
+      ]
     }
 
-    const result = parser.parse( '0 1 2 . 3 4' )[0] //TODO: fix this indexing
+    const result = parser.parse( '0 1 2 . 3 4' )//TODO: fix this indexing
+
+    assert.deepEqual( result, expected )
+  })
+
+  it( "Testing four groups marked out by feet.", () => {
+    const expected = {
+      type:'group',
+      values:[
+        {
+          type:'group',
+          values:[
+            { type: 'number', value: 0 },
+            { type: 'number', value: 1 },
+            { type: 'number', value: 2 },
+          ]
+        },
+        {
+          type:'group',
+          values:[
+            { type: 'number', value: 3 },
+            { type: 'number', value: 4 }
+          ]
+        },
+        {
+          type:'group',
+          values:[
+            { type: 'number', value: 5 },
+            { type: 'number', value: 6 }
+          ]
+        },
+        {
+          type:'group',
+          values:[
+            { type: 'number', value: 7 }
+          ]
+        }
+
+      ]
+    }
+
+    const result = parser.parse( '0 1 2 . 3 4 . 5 6 . 7' )//TODO: fix this indexing
 
     assert.deepEqual( result, expected )
   })
