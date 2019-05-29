@@ -72,7 +72,9 @@ const shouldRemap = pattern => shouldNotRemap.indexOf( pattern.type ) === -1
 // if an event is found that represents a pattern (as opposed to a constant) this function
 // is called to query the pattern and map any generated events to the appropriate timespan
 const processPattern = ( pattern, duration, phase, phaseIncr, override = null, shouldRemapArcs=true ) => {
-  const patternFunc = Array.isArray( pattern ) ? queryArc : handlers[ pattern.type ]
+  const patternFunc = Array.isArray( pattern ) || pattern.type === 'group' 
+    ? queryArc 
+    : handlers[ pattern.type ]
 
   const patternEvents = patternFunc( 
     [], 
@@ -235,7 +237,14 @@ const queryArc = function( eventList, pattern, phase, duration, overrideIncr=nul
   eventList = eventList.filter( evt => {
     return evt.arc.start.valueOf() >= start.valueOf() && evt.arc.start.valueOf() <= end.valueOf()
   })
-
+  // XXX should this be applied everytime queryArc is called? maybe it should only be applied
+  // at the top-most level, which would require a wrapper function...
+  .map( evt => {
+    evt.arc.start = evt.arc.start.sub( start )
+    evt.arc.end   = evt.arc.end.sub( start )
+    return evt
+  })
+ 
   return eventList
 }
 
