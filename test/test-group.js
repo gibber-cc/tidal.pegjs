@@ -6,7 +6,7 @@
 
 const assert   = require( 'assert')
 const parser   = require('../dist/tidal.js')
-const queryArc = require( '../functional.js' )
+const queryArc = require( '../queryArc.js' )
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 
@@ -60,4 +60,29 @@ describe( 'Testing simple number series groups.', () => {
     )
   })
 
+  it( `when starting with a phase of 1/4, "0 1" should schedule one event, at 1/2`, () => {
+    const expected = [
+      {
+        value:1,
+        arc: { start: Fraction(1,4), end:Fraction(3,4) }
+      }
+    ]
+    
+    const pattern = parser.parse('0 1')
+
+    assert.deepEqual( 
+      expected, 
+      queryArc( [], pattern, Fraction(.25), Fraction(.75) ) 
+    )
+  })
+
+  it( `when starting with a phase of .85 and a duration of .1, "0 1" should schedule no events`, () => {
+    const expected = []
+    const pattern = parser.parse('0 1')
+
+    assert.deepEqual( 
+      expected, 
+      queryArc( [], pattern, Fraction(.85), Fraction(.1) ) 
+    )
+  })
 })
