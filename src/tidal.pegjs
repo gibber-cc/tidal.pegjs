@@ -54,18 +54,16 @@ group "group" = _ '[' _ values:term+ _ ']' _ {
 
 
 // // bjorklund
-euclid = _ value:noteuclid '(' _ soundNum:term+ ',' _ steps:term+ _ ')'? ','? _ rotateStep:term* _ ')'? {
+euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term _ ')'? ','? _ rotation:term* _ ')'? {
+  const result = {
+    type:'euclid',
+    pulses, 
+    slots, 
+    value,
+    'rotation': rotation.length > 0 ? rotation[ 0 ] : null
+  }
 
-  let result = {};
-  result.soundNum = soundNum[0];
-  if (result.soundNum.type === 'group') delete result.soundNum.type;
-  result.steps = steps[0];
-  if (rotateStep) result.rotateStep = rotateStep[0];
-  else result.rotateStep = null;
-  result.value = value;
-  result.type = 'euclid';
-
-  return result;
+  return result
 }
 // avoid left-recursions
 noteuclid = body:( group / number / word / rest / onestep) _ { return body }

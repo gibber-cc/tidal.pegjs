@@ -12,28 +12,31 @@ describe( 'Testing Euclidean rhythms.', () => {
   it( 'should generate a euclidean rhythm', () => {
     const expected = {
       value: { type:'number', value:60 },
-      soundNum:{ type:'number', value:3  },
-      steps: { type:'number', value:8  },
-      rotateStep: null,
+      pulses:{ type:'number', value:3  },
+      slots: { type:'number', value:8  },
+      rotation: null,
       type:  'euclid'
     }
 
-    const result = parser.parse( '60( 3,8)' )
+    const result = parser.parse( '60(3,8)' )
 
-    assert.deepEqual( expected, result )
+    assert.deepEqual( result, expected )
   });
 
 
-  it( 'should generate a euclidean rhythm with a group determining soundNum', () => {
+  it( 'should generate a euclidean rhythm with a group determining pulses', () => {
     const group ={
       value: { type:'number', value:60 },
-      soundNum:{
-        '0': { type:'number', value:3 },
-        '1/2': { type:'number', value:5 },
+      pulses:{
+        type:'group',
+        values:[
+         { type:'number', value:3 },
+         { type:'number', value:5 }
+        ]
       },
-      steps: { type:'number', value:8  },
-      rotateStep: null,
-      type:  'euclid'
+      slots: { type:'number', value:8  },
+      rotation: null,
+      type: 'euclid'
     }
 
     const result = parser.parse( '60( [3 5],8 )' )
@@ -45,9 +48,9 @@ describe( 'Testing Euclidean rhythms.', () => {
   it( 'should generate a euclidean rhythm with a group determining soundNum and a number for rotateStep', () => {
     const group ={
       value: { type:'number', value:60 },
-      soundNum: { type:'number', value:5 },
-      steps: { type:'number', value:8  },
-      rotateStep: {type: 'number', value:2},
+      pulses: { type:'number', value:5 },
+      slots: { type:'number', value:8  },
+      rotation: {type: 'number', value:2},
       type:  'euclid'
     }
 
