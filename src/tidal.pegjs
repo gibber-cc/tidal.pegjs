@@ -13,7 +13,6 @@
 
 pattern =  euclid / repeat / layer / group / list / onestep / polymeter / term 
 
-
 // generic term for matching in groups
 term "term" = body:(
   polymeter / layer / degrade / repeat / feet / group / euclid  / number / word / rest / onestep
@@ -84,14 +83,7 @@ repeat = value:notrepeat _ operator:op  _ repeatValue:term {
 // avoid left-recursions
 notrepeat = body:(euclid / polymeter / group / number / word / rest /onestep) _ { return body }
 
-
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
-
-  left = parseToObject(left)
-  /*left.type = 'group'*/
-  right = parseToObject(right)
-  /*right.type = 'group'*/
-
   const result = { 
     'left':{
       type:'group',
@@ -104,11 +96,8 @@ polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
     type: 'polymeter' 
   }
 
-  /*console.log( 'polymeter:', result )*/
-
   return result
 }
-
 
 // return a rest object
 rest = '~' {
@@ -149,19 +138,20 @@ notfoot = degrade / polymeter / rest / repeat / euclid / group / number / word /
 // basically, get each list and push into an array while leaving out whitespace
 // and commas
 layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
-
-  const concurrent = []
+  const values = []
 
   for( let i = 0; i < body.length; i++ ) {
-  	concurrent.push( body[ i ][ 0 ] )
-    concurrent[ concurrent.length - 1 ].type = 'group'
+  	values.push( body[ i ][ 0 ] )
+    values[ values.length - 1 ].type = 'group'
   }
 
   end.type = 'group'
-  concurrent.push( end )
+  values.push( end )
 
-  let result = parseToObject(concurrent)
-  result.type = 'layer'
+  const result = {
+    type: 'layers',
+    values
+  }
 
   return result
 }
