@@ -12,11 +12,8 @@ describe( 'Testing degradation.', () => {
   it( 'should degrade a number when followed by a question mark.', () => {
 
     const expected = {
-      '0': {
-        type: 'degrade',
-        value: {type: 'number', value: 0}
-      },
-      type: 'group'
+      type: 'degrade',
+      value: {type: 'number', value: 0}
     }
 
     const result = parser.parse( '0?' )
@@ -27,19 +24,21 @@ describe( 'Testing degradation.', () => {
 
     it( 'should degrade distinct numbers in pattern when followed by a question mark.', () => {
       const expected = {
-        '0': {
-          type:'degrade',
-          value:{ type:'number', value:1 }
-        },
-        '1/3': {
-          type:'degrade',
-          value:{ type:'number', value:2 }
-        },
-        '2/3': {
-          type:'degrade',
-          value:{ type:'number', value:3 }
-        },
-        type: 'group'
+        type:'group',
+        values:[
+          {
+            type:'degrade',
+            value:{ type:'number', value:1 }
+          },
+          { 
+            type:'degrade',
+            value:{ type:'number', value:2 }
+          },
+          {
+            type:'degrade',
+            value:{ type:'number', value:3 }
+          }
+        ],
       }
 
       const result = parser.parse( '1? 2? 3?' )

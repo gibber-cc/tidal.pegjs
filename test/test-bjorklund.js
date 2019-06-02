@@ -21,7 +21,7 @@ describe( 'Testing Euclidean rhythms.', () => {
     const result = parser.parse( '60(3,8)' )
 
     assert.deepEqual( result, expected )
-  });
+  })
 
 
   it( 'should generate a euclidean rhythm with a group determining pulses', () => {
@@ -42,7 +42,7 @@ describe( 'Testing Euclidean rhythms.', () => {
     const result = parser.parse( '60( [3 5],8 )' )
 
     assert.deepEqual( group, result )
-  });
+  })
 
 
   it( 'should generate a euclidean rhythm with a group determining soundNum and a number for rotateStep', () => {
@@ -57,6 +57,6 @@ describe( 'Testing Euclidean rhythms.', () => {
     const result = parser.parse( '60( 5,8,2 )' )
 
     assert.deepEqual( group, result )
-  });
+  })
 
 })
