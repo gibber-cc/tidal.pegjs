@@ -19,10 +19,13 @@
 
 const assert = require( 'assert')
 const parser = require('../dist/tidal.js')
+const queryArc = require( '../queryArc.js' )
+const Fraction = require( 'fraction.js' )
 
 describe('Testing polymeters', () => {
 
 
+  /*
   it('{} should return a group marked as polymeter', () => {
 
     const expected = {
@@ -48,6 +51,49 @@ describe('Testing polymeters', () => {
 
     assert.deepEqual(expected, result)
 
-  })
+  })*/
 
+  it( `"0 1" should schedule as two events, at 0 and 1/2`, () => {
+    const expected = [
+      {
+        value:0,
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      },
+      {
+        value:1,
+        arc: { start: Fraction(1,2), end:Fraction(1) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      },
+      {
+        value:3,
+        arc: { start: Fraction(1,2), end:Fraction(1) }
+      },
+      {
+        value:4,
+        arc: { start: Fraction(1), end:Fraction(3,2) }
+      },
+      {
+        value:0,
+        arc: { start: Fraction(1), end:Fraction(3,2) }
+      },
+      {
+        value:1,
+        arc: { start: Fraction(3,2), end:Fraction(2) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(3,2), end:Fraction(2) }
+      }
+    ]
+    
+    const pattern = parser.parse('{0 1, 2 3 4}')
+
+    assert.deepEqual( 
+      expected, 
+      queryArc( [], pattern, Fraction(0), Fraction(1) ) 
+    )
+  })
 })

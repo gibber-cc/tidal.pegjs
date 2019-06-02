@@ -10,6 +10,7 @@
 describe( 'Testing layers and nested layers.', () => {
 
 
+  /*
   it( 'Commas should return a group marked as a layer', () => {
 
     const expected = {
@@ -17,9 +18,6 @@ describe( 'Testing layers and nested layers.', () => {
         '0': { type:'number', value:0 },
         '1/3': { type:'number', value:1 },
         '2/3': { type:'number', value:2 },
-        type: 'group'
-      },
-      '1/2': {
         '0': { type:'number', value:3 },
         '1/2': { type:'number', value:4 },
         type: 'group'
@@ -61,5 +59,8 @@ describe( 'Testing layers and nested layers.', () => {
     const result  = parser.parse('[1 2 3, [4 5] 6, 7 8]')[0]
 
   });
+
+  */
+
 
 });

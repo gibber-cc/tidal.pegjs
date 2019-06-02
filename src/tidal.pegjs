@@ -87,15 +87,13 @@ notrepeat = body:(euclid / polymeter / group / number / word / rest /onestep) _ 
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
 
   left = parseToObject(left)
-  left.type = 'group'
+  /*left.type = 'group'*/
   right = parseToObject(right)
-  right.type = 'group'
+  /*right.type = 'group'*/
 
-  let result = {
-    left: left,
-    right: right,
-    type: 'polymeter'
-  }
+  const result = { left, right, type: 'polymeter' }
+
+  console.log( 'polymeter:', result )
 
   return result
 }
