@@ -22,11 +22,11 @@ const parser = require('../dist/tidal.js')
 const queryArc = require( '../queryArc.js' )
 const Fraction = require( 'fraction.js' )
 
+const util     = require( 'util' )
+
 describe('Testing polymeters', () => {
 
-
-  /*
-  it('{} should return a group marked as polymeter', () => {
+  it('{0,1 2} should parse as a polymeter', () => {
 
     const expected = {
       left: {
@@ -47,13 +47,14 @@ describe('Testing polymeters', () => {
       type: 'polymeter'
     }
 
-    const result = parser.parse('{1 2 3 4, 1 2 3 4 5}')[0]
+    const result = parser.parse('{0,1 2}')
 
-    assert.deepEqual(expected, result)
+    assert(result.type === 'polymeter')
 
-  })*/
+  })
 
-  it( `"0 1" should schedule as two events, at 0 and 1/2`, () => {
+  it( `{0 1, 2 3 4} should parse as polymeter and schedule correctly over two cycles.`, () => {
+    // must be left pattern first, right pattern second
     const expected = [
       {
         value:0,
@@ -62,6 +63,14 @@ describe('Testing polymeters', () => {
       {
         value:1,
         arc: { start: Fraction(1,2), end:Fraction(1) }
+      },
+      {
+        value:0,
+        arc: { start: Fraction(1), end:Fraction(3,2) }
+      },
+      {
+        value:1,
+        arc: { start: Fraction(3,2), end:Fraction(2) }
       },
       {
         value:2,
@@ -75,14 +84,7 @@ describe('Testing polymeters', () => {
         value:4,
         arc: { start: Fraction(1), end:Fraction(3,2) }
       },
-      {
-        value:0,
-        arc: { start: Fraction(1), end:Fraction(3,2) }
-      },
-      {
-        value:1,
-        arc: { start: Fraction(3,2), end:Fraction(2) }
-      },
+
       {
         value:2,
         arc: { start: Fraction(3,2), end:Fraction(2) }
@@ -91,9 +93,19 @@ describe('Testing polymeters', () => {
     
     const pattern = parser.parse('{0 1, 2 3 4}')
 
+    //console.log( util.inspect( pattern, { depth:5 } ) )
+
     assert.deepEqual( 
       expected, 
-      queryArc( [], pattern, Fraction(0), Fraction(1) ) 
+      queryArc( pattern, Fraction(0), Fraction(2) ) 
     )
   })
 })
+//events = queryArc( 
+//  { 
+//    type:'polymeter', 
+//    left: { type:'group', values:[{ type:'number', value:0 },{ type:'number', value:1 }] }, 
+//    right:{ type:'group', values:[{ type:'number', value:2 },{ type:'number', value:3 }, { type:'number', value:4 }] } 
+//  },
+//  Fraction(0), Fraction(2) 
+//)

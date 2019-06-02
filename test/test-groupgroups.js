@@ -103,8 +103,8 @@ describe( 'Testing group groups and nested group groups.', () => {
     const pattern = parser.parse('0 [1 2]')
 
     assert.deepEqual( 
-      expected, 
-      queryArc( [], pattern, Fraction(0), Fraction(1) ) 
+      queryArc( pattern, Fraction(0), Fraction(1) ),
+      expected 
     )
   })
 
@@ -131,8 +131,8 @@ describe( 'Testing group groups and nested group groups.', () => {
     const pattern = parser.parse('0 [1 [2 3]]')
 
     assert.deepEqual( 
+      queryArc( pattern, Fraction(0), Fraction(1) ),
       expected, 
-      queryArc( [], pattern, Fraction(0), Fraction(1) ) 
     )
   })
 
@@ -159,7 +159,7 @@ describe( 'Testing group groups and nested group groups.', () => {
       ]
     }
 
-    const result = parser.parse( '0 1 2 . 3 4' )//TODO: fix this indexing
+    const result = parser.parse( '0 1 2 . 3 4' )
 
     assert.deepEqual( result, expected )
   })

@@ -6,12 +6,12 @@
     cycleBody.values = body
     cycleBody.type = 'group'
 
-    console.log( 'body:', body.type, body.values, body )
+    /*console.log( 'body:', body.type, body.values, body )*/
     return body 
   }
 }
 
-pattern =  euclid / repeat / layer / group / list / onestep 
+pattern =  euclid / repeat / layer / group / list / onestep / polymeter / term 
 
 
 // generic term for matching in groups
@@ -21,7 +21,10 @@ term "term" = body:(
 
 
 // a list (which is a group)
-list = _ values:term+ _ {
+list = _ _valuesstart:term _ _valuesend:term+ _ {
+  _valuesend.unshift( _valuesstart )
+  const values = _valuesend
+
   let out
   
   if( values.type === undefined ) {
@@ -91,9 +94,19 @@ polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
   right = parseToObject(right)
   /*right.type = 'group'*/
 
-  const result = { left, right, type: 'polymeter' }
+  const result = { 
+    'left':{
+      type:'group',
+      values:left
+    }, 
+    'right':{
+      type:'group',
+      values:right,
+    },
+    type: 'polymeter' 
+  }
 
-  console.log( 'polymeter:', result )
+  /*console.log( 'polymeter:', result )*/
 
   return result
 }
@@ -113,8 +126,8 @@ feet = start:foot+ end:notfoot+ {
   }
 
   // some different wrangling for two feet vs. more than two feet...
-  let values = start.length > 1 ? start.slice(0) : start[0]
-  let result
+  let values = start.length > 1 ? start.slice(0) : start[0],
+      result
   
   if( start.length > 1 ) {
     result = values.map( v => ({ type: 'group', values:v }) )
@@ -124,7 +137,7 @@ feet = start:foot+ end:notfoot+ {
   
   result.push( __end )
 
-  return result 
+  return { type:'group', values:result } 
 }
 // identifies a group delimited by a '.' character
 foot = value:notfoot+ dot _ {

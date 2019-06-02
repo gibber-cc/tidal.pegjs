@@ -36,6 +36,7 @@ const queryArc = function( pattern, phase, duration ) {
     return evt
   })
  
+  //console.log( 'eventList:', log(eventList,{depth:4}) )
   return eventList
 }
 
@@ -134,9 +135,13 @@ const shouldRemap = pattern => shouldNotRemap.indexOf( pattern.type ) === -1
 
 // I assume this will need to be a switch on pattern.type in the future...
 const getPhaseIncr = pattern => {
-  const incr = pattern.type === 'polymeter'
-    ? Fraction( 1, pattern.left.values.length )
-    : Fraction( 1, pattern.values.length )
+  let incr
+
+  switch( pattern.type ) {
+    case 'polymeter': incr = Fraction( 1, pattern.left.values.length ); break;
+    case 'number': case 'string': incr = Fraction( 1 ); break;
+    default: incr = Fraction( 1, pattern.values.length ); break;
+  }
 
   return incr
 }
@@ -202,6 +207,15 @@ const handlers = {
     })
    
     return state.concat( eventList )
+  },
+
+  number( state, pattern, phase, duration ) {
+    state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
+    return state 
+  },
+  string( state, pattern, phase, duration ) {
+    state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
+    return state 
   },
 
   polymeter( state, pattern, phase, duration ) {

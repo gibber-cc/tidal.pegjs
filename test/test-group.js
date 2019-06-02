@@ -26,20 +26,6 @@ describe( 'Testing simple number series groups.', () => {
     assert.deepEqual( expected, result )
   })
 
-
-  it ('"a" should parse to an array of 1 string, marked as group.', () => {
-    const expected = {
-      values:[
-        { type: 'string', value: 'a' },
-      ],
-      type: 'group'
-    }
-
-    const result = parser.parse('a')
-
-    assert.deepEqual(expected, result)
-  })
-
   it( `"0 1" should schedule as two events, at 0 and 1/2`, () => {
     const expected = [
       {
@@ -56,15 +42,15 @@ describe( 'Testing simple number series groups.', () => {
 
     assert.deepEqual( 
       expected, 
-      queryArc( [], pattern, Fraction(0), Fraction(1) ) 
+      queryArc( pattern, Fraction(0), Fraction(1) ) 
     )
   })
 
-  it( `when starting with a phase of 1/4, "0 1" should schedule one event, at 1/2`, () => {
+  it( `when starting with a phase of 1/4, "0 1" should schedule one event, at 1/4`, () => {
     const expected = [
       {
         value:1,
-        arc: { start: Fraction(1,4), end:Fraction(3,4) }
+        arc: { start: Fraction(1,4), end:Fraction(1,2) }
       }
     ]
     
@@ -72,7 +58,7 @@ describe( 'Testing simple number series groups.', () => {
 
     assert.deepEqual( 
       expected, 
-      queryArc( [], pattern, Fraction(.25), Fraction(.75) ) 
+      queryArc( pattern, Fraction(.25), Fraction(.75) ) 
     )
   })
 
@@ -82,7 +68,7 @@ describe( 'Testing simple number series groups.', () => {
 
     assert.deepEqual( 
       expected, 
-      queryArc( [], pattern, Fraction(.85), Fraction(.1) ) 
+      queryArc( pattern, Fraction(.85), Fraction(.1) ) 
     )
   })
 })
