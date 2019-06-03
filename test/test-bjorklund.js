@@ -45,7 +45,7 @@ describe( 'Testing Euclidean rhythms.', () => {
   })
 
 
-  it( 'should generate a euclidean rhythm with a group determining soundNum and a number for rotateStep', () => {
+  it( 'should generate a euclidean rhythm with a rotation', () => {
     const group ={
       value: { type:'number', value:60 },
       pulses: { type:'number', value:5 },

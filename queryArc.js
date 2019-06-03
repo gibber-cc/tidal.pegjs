@@ -279,6 +279,18 @@ const handlers = {
     return state.concat( left ).concat( right )
   },
 
+  layers( state, pattern, phase, duration ) {
+    //pattern.left.parent = pattern.right.parent = pattern
+    for( const group of pattern.values ) {
+      const incr = getPhaseIncr( group )
+      state = state.concat(
+        processPattern( group, duration, phase.clone(), incr, incr, false )
+      )
+    }
+
+    return state
+  },
+
   speed( state, pattern, phase, duration ) {
     const speeds = queryArc( [], pattern.speed, Fraction(0), Fraction(1) )
     // the general process of increasing the speed of a pattern is to query

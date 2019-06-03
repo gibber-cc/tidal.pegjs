@@ -70,31 +70,4 @@ describe('Testing one-step per cycle', () => {
 
   })
 
-   
-/*
-
-  TODO: this test does not pass yet because of the indexing issue
-
-   it ('nested <> should return nested groups marked as onestep', () => {
-     const expected = {
-       '0':{
-         '0': {type: 'number', value: 1},
-         '1/2': {
-           '0': { type: 'number', value: 2 },
-           '1/2': {type: 'number', value: 4},
-           type: 'onestep'
-         },
-         type: 'group'
-       },
-       '1/2': {
-         '0': {type: 'number', value:5},
-         '1/2': {type: 'number', value: 6},
-         type: 'group'
-       },
-       type: 'onestep'
-     }
-   })
-
-   */
-
  })
