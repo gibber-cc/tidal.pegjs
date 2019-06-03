@@ -54,7 +54,8 @@ describe('Testing polymeters', () => {
   })
 
   it( `{0 1, 2 3 4} should parse as polymeter and schedule correctly over two cycles.`, () => {
-    // must be left pattern first, right pattern second
+    // must be left pattern first, right pattern second, but broken up by cycle.
+    // so left (cycle1), right(cycle1), left( cycle2), right(cycle2)
     const expected = [
       {
         value:0,
@@ -65,20 +66,20 @@ describe('Testing polymeters', () => {
         arc: { start: Fraction(1,2), end:Fraction(1) }
       },
       {
-        value:0,
-        arc: { start: Fraction(1), end:Fraction(3,2) }
-      },
-      {
-        value:1,
-        arc: { start: Fraction(3,2), end:Fraction(2) }
-      },
-      {
         value:2,
         arc: { start: Fraction(0), end:Fraction(1,2) }
       },
       {
         value:3,
         arc: { start: Fraction(1,2), end:Fraction(1) }
+      },
+      {
+        value:0,
+        arc: { start: Fraction(1), end:Fraction(3,2) }
+      },
+      {
+        value:1,
+        arc: { start: Fraction(3,2), end:Fraction(2) }
       },
       {
         value:4,
@@ -93,11 +94,9 @@ describe('Testing polymeters', () => {
     
     const pattern = parser.parse('{0 1, 2 3 4}')
 
-    //console.log( util.inspect( pattern, { depth:5 } ) )
-
     assert.deepEqual( 
-      expected, 
-      queryArc( pattern, Fraction(0), Fraction(2) ) 
+      queryArc( pattern, Fraction(0), Fraction(2) ), 
+      expected 
     )
   })
 })

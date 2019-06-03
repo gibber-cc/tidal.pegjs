@@ -6,9 +6,10 @@ const log      = util.inspect
 /* queryArc
  *
  * Generates events for provided pattern, starting at
- * an initial phase. Filters events outside of the 
- * the intended range. Remaps events to be relative
- * to the initial phase.
+ * an initial phase, subdivides queries in individual 
+ * cycles if duration of query is greater than 1 cycle.
+ * Filters events outside of the the intended range. 
+ * Remaps events to be relative to the initial phase.
  */
 const queryArc = function( pattern, phase, duration ) {
   const start         = phase.clone(),
@@ -16,18 +17,40 @@ const queryArc = function( pattern, phase, duration ) {
         // get phase offset if scheduling begins in middle of event arc
         adjustedPhase = adjustPhase( phase, getPhaseIncr( pattern ), end )
 
-  const eventList = processPattern( 
-    pattern, 
-    duration, 
-    adjustedPhase, 
-    null, 
-    null, 
-    false//shouldRemap( pattern ) 
-  )
+  let eventList
+
+  // if we're querying an arc that is less than or equal to one cycle in length..
+  if( duration.valueOf() <= 1 ) {
+    eventList = processPattern( 
+      pattern, 
+      duration, 
+      adjustedPhase, 
+      null, 
+      null, 
+      false//shouldRemap( pattern ) 
+    )
+  }else{
+    // for longer arcs we need to query one cycle at a time
+    eventList = []
+    let count = 0
+    for( let i = adjustedPhase.valueOf(); i < adjustedPhase.add( duration ).valueOf(); i++ ) {
+      eventList = eventList.concat( 
+        processPattern( 
+          pattern, 
+          Fraction(1),
+          adjustedPhase.add( count++ ), 
+          null, 
+          null, 
+          false
+        )
+      )
+    }
+  }
+
   // prune any events that fall before our start phase or after our end phase
-  .filter( evt => {
+  eventList = eventList.filter( evt => {
     return evt.arc.start.valueOf() >= start.valueOf() 
-        && evt.arc.start.valueOf() < end.valueOf()
+        && evt.arc.start.valueOf() <  end.valueOf()
   })
   // remap events to make their arcs relative to initial phase argument
   .map( evt => {
@@ -177,7 +200,6 @@ const handlers = {
       // get duration of current event being processed
       const dur = calculateDuration( phase, phaseIncr, end )
 
-      //console.log( 'dur:', dur.toFraction(), phase.toFraction() )
       // if value is not a numeric or string constant (if it's a pattern)...
       if( member === undefined || isNaN( member.value ) ) {
         // query the pattern and remap time values appropriately 
@@ -189,7 +211,6 @@ const handlers = {
           value:member.value, 
           arc:Arc( phase, phase.add( dur ) ),
         })
-        //console.log( member.value, phase.toFraction(), phase.add( dur ).toFraction() )
       }
 
       // assuming we are starting / ending at a regular phase increment value...
@@ -209,16 +230,40 @@ const handlers = {
     return state.concat( eventList )
   },
 
+  onestep( state, pattern, phase, duration ) {
+    pattern.values.forEach( group => {
+      // initialize, then increment. this assumes that the pattern will be parsed once,
+      // and then the resulting data structure will be queried repeatedly, enabling the use
+      // of state.
+      group.count = group.count === undefined ? 0 : group.count + 1
+
+      state.push({ 
+        arc:Arc( phase, phase.add( duration ) ), 
+        value:group.values[ group.count ] 
+      })
+    })
+
+    return state
+  },
+
   number( state, pattern, phase, duration ) {
     state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
     return state 
   },
+
   string( state, pattern, phase, duration ) {
     state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
     return state 
   },
+
   degrade( state, pattern, phase, duration ) {
-    if( Math.random() > .5 ) state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
+    if( Math.random() > .5 ) {
+      state.push({ 
+        arc:Arc( phase, phase.add( duration ) ), 
+        value:pattern.value 
+      })
+    }
+
     return state 
   },
 
@@ -266,8 +311,8 @@ const handlers = {
       })
       // remove events don't fall  in the current window
       .filter( evt => 
-        evt.arc.start.compare( incr.mul(i) ) >= 0 && 
-        evt.arc.start.compare( incr.mul(i+1) ) < 0 
+        evt.arc.start.compare( incr.mul( i ) ) >= 0 
+          && evt.arc.start.compare( incr.mul( i+1 ) ) < 0 
       )
       // add to previous events
       .concat( events )

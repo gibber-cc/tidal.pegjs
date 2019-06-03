@@ -54,9 +54,9 @@ describe( 'Testing degradation.', () => {
     let foundNonDegraded = false
     let foundDegraded = false
 
-    for( let i = 0; i < 3; i++ ) {
-      const result = parser.parse( '0?' )
-      const event = queryArc( result, Fraction(0), Fraction(1) )
+    for( let i = 0; i < 100; i++ ) {
+      const result = parser.parse( '0?' ),
+             event = queryArc( result, Fraction(0), Fraction(1) )
       
       if( event.length > 0 ) {
         foundDegraded = true
