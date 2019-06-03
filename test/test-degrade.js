@@ -6,9 +6,11 @@
 
 const assert = require( 'assert')
 const parser = require('../dist/tidal.js')
+const queryArc = require( '../queryArc.js' )
+const Fraction = require( 'fraction.js' )
+const util     = require( 'util' )
 
 describe( 'Testing degradation.', () => {
-
   it( 'should degrade a number when followed by a question mark.', () => {
 
     const expected = {
@@ -23,7 +25,6 @@ describe( 'Testing degradation.', () => {
 
 
   it( 'should degrade distinct numbers in pattern when followed by a question mark.', () => {
-
     const expected = {
       type:'group',
       values:[
@@ -45,6 +46,24 @@ describe( 'Testing degradation.', () => {
     const result = parser.parse( '1? 2? 3?' )
 
     assert.deepEqual( expected, result )
+  })
+
+  it( 'given 100 tries, a degraded value will both appear and not appear at least once.', () => {
+    let foundNonDegraded = false
+    let foundDegraded = false
+
+    for( let i = 0; i < 100; i++ ) {
+      const result = parser.parse( '0?' )
+      const event = queryArc( result, Fraction(0), Fraction(1) )
+      
+      if( event.length > 0 ) {
+        foundDegraded = true
+      }else{
+        foundNonDegraded = true
+      }
+    }
+
+    assert( foundNonDegraded === true && foundDegraded === true )
   })
 
 })

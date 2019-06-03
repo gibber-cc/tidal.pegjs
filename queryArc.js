@@ -140,7 +140,7 @@ const getPhaseIncr = pattern => {
   switch( pattern.type ) {
     case 'polymeter': incr = Fraction( 1, pattern.left.values.length ); break;
     case 'number': case 'string': incr = Fraction( 1 ); break;
-    default: incr = Fraction( 1, pattern.values.length ); break;
+    default: incr = pattern.values !== undefined ? Fraction( 1, pattern.values.length ) : Fraction(1); break;
   }
 
   return incr
@@ -215,6 +215,10 @@ const handlers = {
   },
   string( state, pattern, phase, duration ) {
     state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
+    return state 
+  },
+  degrade( state, pattern, phase, duration ) {
+    if( Math.random() > .5 ) state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
     return state 
   },
 

@@ -23,7 +23,7 @@ const parser = require('../dist/tidal.js')
      const result = parser.parse('<0 1 2>')
 
      assert.deepEqual( result, expected )
-   });
+   })
 
    it('multiple <> should return nested group marked as onestep', () => {
 

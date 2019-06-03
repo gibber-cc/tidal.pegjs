@@ -9,7 +9,7 @@ const parser = require('../dist/tidal.js')
 
 describe( 'Testing rests.', () => {
 
-  it( 'should generate a rest object when parsing a ~', () => {
+  it( 'should generate rest objects when parsing "0 ~ 2 ~"', () => {
     const expected = {
       type:'group',
       values:[ 
