@@ -48,11 +48,13 @@ describe( 'Testing degradation.', () => {
     assert.deepEqual( expected, result )
   })
 
+  // given that degrade is stochastic, there is no 100% surefire way to test it. Here we test 100
+  // times to ensure that it returns a value and that it fails to return a value (degraded)
   it( 'given 100 tries, a degraded value will both appear and not appear at least once.', () => {
     let foundNonDegraded = false
     let foundDegraded = false
 
-    for( let i = 0; i < 100; i++ ) {
+    for( let i = 0; i < 3; i++ ) {
       const result = parser.parse( '0?' )
       const event = queryArc( result, Fraction(0), Fraction(1) )
       
