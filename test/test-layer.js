@@ -4,14 +4,12 @@
  *
  */
 
- const assert = require( 'assert')
- const parser = require('../dist/tidal.js')
+const assert = require( 'assert' )
+const parser = require( '../dist/tidal.js' )
 
 describe( 'Testing layers.', () => {
 
-
-  
-  it( 'Commas should return a group marked as a layer', () => {
+  it( 'Commas should return a groups marked as part of layers (polyrhythms)', () => {
 
     const expected = {
       type:'layers',

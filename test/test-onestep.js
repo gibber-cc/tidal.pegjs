@@ -10,45 +10,50 @@ const parser = require('../dist/tidal.js')
 
    it('<> should return a group marked as onestep', () => {
      const expected = {
-       '0': {
-         '0': {type: 'number', value: 0},
-         '1/3': {type: 'number', value: 1},
-         '2/3': {type: 'number', value: 2},
-         type: 'group'
-       },
-       type: 'onestep'
+       type:'onestep',
+       values:[{
+         type:'group',
+         values:[
+           { type: 'number', value: 0 },
+           { type: 'number', value: 1 },
+           { type: 'number', value: 2 }
+         ]
+       }]
      }
+     const result = parser.parse('<0 1 2>')
 
-      const result = parser.parse('<0 1 2>')[0]
-
-      assert.deepEqual( expected, result )
-
+     assert.deepEqual( result, expected )
    });
-
 
    it('multiple <> should return nested group marked as onestep', () => {
 
      const expected = {
-       '0': {
-         '0': {type: 'number', value: 0},
-         '1/3': {type: 'number', value: 1},
-         '2/3': {type: 'number', value: 2},
-         type: 'group'
-       },
-       '1/2': {
-         '0': {type: 'number', value: 3},
-         '1/3': {type: 'number', value: 4},
-         '2/3': {type: 'number', value: 5},
-         type: 'group'
-       },
-       type: 'onestep'
+       type:'onestep',
+       values:[
+         {
+           type:'group',
+           values:[
+             { type: 'number', value: 0 },
+             { type: 'number', value: 1 },
+             { type: 'number', value: 2 }
+           ],
+         },
+         {
+           type:'group',
+           values:[
+            { type: 'number', value: 3 },
+            { type: 'number', value: 4 },
+            { type: 'number', value: 5 }
+           ]
+         },
+       ]
      }
 
-     assert.deepEqual( expected, parser.parse('<0 1 2, 3 4 5>')[0] )
+     assert.deepEqual( parser.parse('<0 1 2, 3 4 5>'), expected )
 
-   });
+   })
 
-
+   
 /*
 
   TODO: this test does not pass yet because of the indexing issue

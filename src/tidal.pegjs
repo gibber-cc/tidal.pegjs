@@ -159,25 +159,17 @@ notlayer = body:(list / euclid / polymeter / group / number / word / rest / ones
 
 
 // One-step
-onestep = _ '<'  _ body:(notonestep _ ','? _ )+ end:notonestep? _'>'_ {
-
-  const concurrent = []
-
-  for( let i = 0; i < body.length; i++ ) {
-    concurrent.push( body[ i ][ 0 ] )
-    concurrent[ concurrent.length - 1 ].type = 'group'
+onestep = '<' _ body:notonestep ','? end:notonestep? _ '>' {
+  const onestep = {
+    type:'onestep',
+    values:[body]
   }
 
-  if (end){
-    end.type = 'group'
-    concurrent.push( end )
+  if( end !== null ) {
+    onestep.values.push( end )
   }
 
-
-  let result = parseToObject(concurrent)
-  result.type = 'onestep'
-
-  return result
+  return onestep 
 }
 notonestep = body:(list / euclid / polymeter / group / number / word / rest / layer) _ { return body }
 
