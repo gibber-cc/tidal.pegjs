@@ -17,11 +17,10 @@
   d1 $ sound "{arpy bass2 drum notes can, bd hh sn cp}""
 */
 
-const assert = require( 'assert')
-const parser = require('../dist/tidal.js')
+const assert   = require( 'assert' )
+const parser   = require( '../dist/tidal.js' )
 const queryArc = require( '../queryArc.js' )
 const Fraction = require( 'fraction.js' )
-
 const util     = require( 'util' )
 
 describe('Testing polymeters', () => {
@@ -30,18 +29,16 @@ describe('Testing polymeters', () => {
 
     const expected = {
       left: {
-        '0': {type: 'number', value: 1},
-        '1/4': {type: 'number', value: 2},
-        '1/2': {type: 'number', value: 3},
-        '3/4': {type: 'number', value: 4},
+        values:[
+          { type: 'number', value: 0 },
+        ],
         type: 'group'
       },
       right: {
-        '0': {type: 'number', value: 1},
-        '1/5': {type: 'number', value: 2},
-        '2/5': {type: 'number', value: 3},
-        '3/5': {type: 'number', value: 4},
-        '4/5': {type: 'number', value: 5},
+        values:[
+         { type: 'number', value: 1 },
+         { type: 'number', value: 2 },
+        ],
         type: 'group'
       },
       type: 'polymeter'
@@ -49,8 +46,7 @@ describe('Testing polymeters', () => {
 
     const result = parser.parse('{0,1 2}')
 
-    assert(result.type === 'polymeter')
-
+    assert.deepEqual( result, expected )
   })
 
   it( `{0 1, 2 3 4} should parse as polymeter and schedule correctly over two cycles.`, () => {
@@ -100,11 +96,3 @@ describe('Testing polymeters', () => {
     )
   })
 })
-//events = queryArc( 
-//  { 
-//    type:'polymeter', 
-//    left: { type:'group', values:[{ type:'number', value:0 },{ type:'number', value:1 }] }, 
-//    right:{ type:'group', values:[{ type:'number', value:2 },{ type:'number', value:3 }, { type:'number', value:4 }] } 
-//  },
-//  Fraction(0), Fraction(2) 
-//)

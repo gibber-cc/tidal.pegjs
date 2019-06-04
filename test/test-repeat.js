@@ -6,16 +6,18 @@
 
 const assert = require( 'assert')
 const parser = require('../dist/tidal.js')
+const queryArc = require( '../queryArc.js' )
+const Fraction = require( 'fraction.js' )
+const util     = require( 'util' )
 
 describe( "Testing repeats with '*'", () => {
-
 
   it( 'should generate a 2x repeat on a number.', () => {
 
     const expected = {
       type: 'repeat',
       operator:'*',
-      repeatValue: { type: 'number', value: 2 },
+      rate: { type: 'number', value: 2 },
       value: { type:'number', value:0 }
     }
 
@@ -23,14 +25,14 @@ describe( "Testing repeats with '*'", () => {
 
     assert.deepEqual(result, expected)
 
-  });
+  })
 
 
   it( 'should generate a 2x repeat on a group pattern', () => {
     const expected = {
       type:'repeat',
       operator: '*',
-      repeatValue:{ type:'number', value:2 },
+      rate:{ type:'number', value:2 },
       value: {
         type:'group',
         values:[
@@ -44,40 +46,46 @@ describe( "Testing repeats with '*'", () => {
 
     assert.deepEqual( result, expected )
 
-  });
+  })
 
-  //it('test euclid and repeat', () => {
+  it( 'should generate two events given "0*2" and a duration of 1' , () => {
+    const expected = [
+      { value:0, arc:{ start:Fraction(0), end:Fraction(1,2) } },
+      { value:0, arc:{ start:Fraction(1,2), end:Fraction(1) } }
+    ]
 
-  //  const expected = {
-  //    '0': {type: 'number', value: 0},
-  //    '1/3':{
-  //      '0':{
-  //        '0': {type: 'number', value:2},
-  //        '1/2': {type: 'number', value: 3},
-  //        type: 'group'
-  //      },
-  //      '1/2': {
-  //        '0': {type: 'number', value: 2},
-  //        '1/3': {
-  //          value: {type: 'number', value: 4},
-  //          soundNum: {type: 'number', value: 3},
-  //          steps: {type: 'number', value: 8},
-  //          rotateStep: {type: 'number', value: 9},
-  //          type: 'euclid'
-  //        },
-  //        '2/3': {
-  //          type: 'repeat',
-  //          operator: '*',
-  //          repeatValue: {type: 'number', value: 2},
-  //          value: {type: 'number', value:7}
-  //        }
-  //      }
-  //    },
-  //    '2/3': {type: 'number', value: 5},
-  //    type: 'group'
-  //  }
+    const pattern = parser.parse( '0*2' )
+    const result = queryArc( pattern, Fraction(0), Fraction(1) )
+    assert.deepEqual( result, expected )
 
-  //  const result = parser.parse('0 [[2 3] [2 4(3,8,9) 7*2]] 5');
-  //});
+    })
+    
 
-})
+  it( 'should generate one events given "0/2" and a duration of 2' , () => {
+    const expected = [
+      { value:0, arc:{ start:Fraction(0), end:Fraction(2) } },
+    ]
+
+    const pattern = parser.parse( '0/2' )
+    const result = queryArc( pattern, Fraction(0), Fraction(1) )
+
+    assert.deepEqual( result, expected )
+
+  })
+  
+  /*
+  it( 'should generate two events given "[0 1]/2" and a duration of 2' , () => {
+    const expected = [
+      { value:0, arc:{ start:Fraction(0), end:Fraction(1) } },
+      { value:1, arc:{ start:Fraction(1), end:Fraction(2) } },
+    ]
+
+    const pattern = parser.parse( '[0 1]/2' )
+    const result = queryArc( pattern, Fraction(0), Fraction(2) )
+
+    console.log( 'result:', util.inspect( result, { depth:3 } ) )
+    assert.deepEqual( result, expected )
+
+    })
+    */
+ })

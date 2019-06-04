@@ -77,8 +77,8 @@ notdegrade = body:( repeat / euclid / group / number / word / onestep) _ { retur
 
 
 // match a binary operation, a la 4*2, or [0 1]*4
-repeat = value:notrepeat _ operator:op  _ repeatValue:term {
-  return { type:'repeat', operator, repeatValue, value }
+repeat = value:notrepeat _ operator:op  _ rate:term {
+  return { type:'repeat', operator, rate, value }
 }
 // avoid left-recursions
 notrepeat = body:(euclid / polymeter / group / number / word / rest /onestep) _ { return body }

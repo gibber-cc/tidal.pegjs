@@ -42,6 +42,23 @@ describe( 'Testing parsing literals.', () => {
     )
   })
 
+  it( `"0" should schedule as two events, at time 0 and with duration 2.`, () => {
+    const expected = [{
+      value:0,
+      arc: { start: Fraction(0), end:Fraction(1) }
+    },{
+      value:0,
+      arc: { start: Fraction(1), end:Fraction(2) }
+    }]
+    
+    const pattern = parser.parse('0')
+
+    assert.deepEqual( 
+      queryArc( pattern, Fraction(0), Fraction(2) ), 
+      expected
+    )
+  })
+
   it( `"a" should schedule as one event, at time 0 and with duration 1.`, () => {
     const expected = [{
       value:'a',

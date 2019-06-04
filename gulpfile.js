@@ -1,7 +1,7 @@
-var gulp = require('gulp');
+const gulp = require('gulp');
 
 // Contains all plugins the project depends on
-var plugins = require('gulp-load-plugins')();
+const plugins = require('gulp-load-plugins')();
 
 
 // Generate the peg from the grammar

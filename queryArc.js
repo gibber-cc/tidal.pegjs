@@ -291,8 +291,8 @@ const handlers = {
     return state
   },
 
-  speed( state, pattern, phase, duration ) {
-    const speeds = queryArc( [], pattern.speed, Fraction(0), Fraction(1) )
+  repeat( state, pattern, phase, duration ) {
+    const speeds = queryArc( pattern.rate, Fraction(0), Fraction(1) )
     // the general process of increasing the speed of a pattern is to query
     // for a longer duration according to the speed, and the scale the resulting
     // events.
@@ -306,71 +306,70 @@ const handlers = {
     // for the second third you'd get the second third of four a's..."
     
     let events = []
-    const incr  = Fraction(1, speeds.length)
+    const incr = Fraction(1, speeds.length)
     for( let i = 0; i < speeds.length; i++ ) {
-      const speed = speeds[ i ].value
+      let speed = speeds[ i ].value
 
-      events = queryArc( [],
-        pattern.values,
-        Fraction( 0 ), 
-        Fraction(speed)
-      )
-      // remap events to correct time spans
-      .map( evt => {
-        evt.arc.start = evt.arc.start.div( speed )
-        evt.arc.end   = evt.arc.end.div( speed )
-        return evt
-      })
-      // remove events don't fall  in the current window
-      .filter( evt => 
-        evt.arc.start.compare( incr.mul( i ) ) >= 0 
-          && evt.arc.start.compare( incr.mul( i+1 ) ) < 0 
-      )
-      // add to previous events
-      .concat( events )
+      if( pattern.operator === '*' ) {
+        events = queryArc( 
+          pattern.value,
+          Fraction( 0 ), 
+          Fraction( speed )
+        )
+        // remap events to correct time spans
+        .map( evt => {
+          evt.arc.start = evt.arc.start.div( speed )
+          evt.arc.end   = evt.arc.end.div( speed )
+          return evt
+        })
+        // remove events don't fall  in the current window
+        .filter( evt => 
+          evt.arc.start.compare( incr.mul( i ) ) >= 0 
+            && evt.arc.start.compare( incr.mul( i+1 ) ) < 0 
+        )
+        // add to previous events
+        .concat( events )
+      }else{
+        speed = 1/speed
+        //console.log( 'phase:', phase.mul( speed ) )
+        //events = queryArc( 
+        //  pattern.value,
+        //  phase.mul( speed ),
+        //  duration.mul( Fraction( speed ) )
+        //)
+        events = processPattern( 
+          pattern.value, 
+          duration.mul( Fraction( speed ) ), 
+          phase.mul( speed ),
+          getPhaseIncr( pattern ).mul( speed ),null,false
+        )
+        //console.log( 'events:', log( events, { depth:4 } ) )
+        // remap events to correct time spans
+        events.map( evt => {
+          if( evt.arc.start.valueOf() !== 0 ) {
+            // XXX I don't know why this is necessary but it gets rid of a off-by-one error
+            evt.arc.start = evt.arc.start.sub( phase.div( 1/speed ) )
+          }
+
+          // also, does the event length need to be adjusted? might as well...
+          //console.log( 'end:', evt.arc.end.toFraction(), phase.toFraction(), speed )
+          evt.arc.end = evt.arc.end.mul( 1/speed )//.mul( 1/speed )
+          //evt.arc.end.sub( phase.div( 1/speed ) ).add( 1/speed - 1)
+
+          return evt
+        })
+        // remove events don't fall in the current window
+        .filter( evt => 
+          evt.arc.start.compare( incr.mul(i) ) >= 0 && 
+          evt.arc.start.compare( incr.mul(i+1) ) <= 0 
+        )
+        // add to previous events
+        .concat( events )
+      }
     }
+
     return state.concat( events )
   },
-
-  // doesn't appear to work for subpatterns
-  slow( state, pattern, phase, duration ) {
-    // see 'fast' pattern type of implementation notes
-    const speeds = queryArc( [], pattern.speed, Fraction(0), Fraction(1) )
-    
-    let events = []
-    const incr  = Fraction(1, speeds.length)
-    for( let i = 0; i < speeds.length; i++ ) {
-      const speed = speeds[ i ].value
-
-      // adjust phase and duration based on speed value
-      events = queryArc( 
-        [],
-        pattern.values,
-        phase.mul( speed ),
-        duration.mul( Fraction( speed ) )
-      )
-      // remap events to correct time spans
-      .map( evt => {
-        if( evt.arc.start.valueOf() !== 0 ) {
-          // XXX I don't know why this is necessary but it gets rid of a off-by-one error
-          evt.arc.start = evt.arc.start.sub( phase.div( 1/speed ) )
-        }
-
-        // also, does the event length need to be adjusted? might as well...
-        evt.arc.end = evt.arc.end.sub( phase.div( 1/speed ) ).add( 1/speed - 1)
-
-        return evt
-      })
-      // remove events don't fall in the current window
-      .filter( evt => 
-        evt.arc.start.compare( incr.mul(i) ) >= 0 && 
-        evt.arc.start.compare( incr.mul(i+1) ) <= 0 
-      )
-      // add to previous events
-      .concat( events )
-    }
-    return state.concat( events )
-  }
 }
 
 
