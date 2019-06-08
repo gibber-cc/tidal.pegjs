@@ -31,9 +31,9 @@ describe('Testing one-step per cycle', () => {
 
   it('<0 1 2> should return three different values when queried over three cycles.', () => {
     const expected = [
-      { value:{ type:'number', value:0 }, arc:{ start:Fraction(0), end:Fraction(1) } },
-      { value:{ type:'number', value:1 }, arc:{ start:Fraction(1), end:Fraction(2) } },
-      { value:{ type:'number', value:2 }, arc:{ start:Fraction(2), end:Fraction(3) } }
+      { value:0, arc:{ start:Fraction(0), end:Fraction(1) } },
+      { value:1, arc:{ start:Fraction(1), end:Fraction(2) } },
+      { value:2, arc:{ start:Fraction(2), end:Fraction(3) } }
     ]
 
     const pattern = parser.parse('<0 1 2>')
