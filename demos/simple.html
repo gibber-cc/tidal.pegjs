@@ -1,0 +1,20 @@
+<!docype html>
+<html lang='en'>
+  <head>
+    <script src='../dist/tidal-pattern.js'></script>
+  </head>
+  <body></body>
+  <script>
+    window.onload = function() {
+      const pattern1 = Pattern( '0 [1 [2 3]]' )
+  
+      console.log( 'querying 0 - 1:' )
+      pattern1.query( 0, 1 )
+      pattern1.print()
+
+      console.log( '\nquery 0 - 2/3:' )
+      pattern1.query( 0, 2/3 )
+      pattern1.print()
+    }
+  </script>
+</html>

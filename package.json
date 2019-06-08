@@ -20,6 +20,7 @@
   "authors": "Charlie Roberts & Mariana Pachon-Puentes",
   "license": "MIT",
   "devDependencies": {
+    "browserify": "^16.2.3",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
@@ -28,7 +29,8 @@
     "gulp-pegjs": "^0.1.0",
     "gulp-watch": "^5.0.1",
     "pegjs": "^0.10.0",
-    "priorityqueue": "^0.2.1"
+    "priorityqueue": "^0.2.1",
+    "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
     "fraction.js": "^4.0.12"

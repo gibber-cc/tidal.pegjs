@@ -6,7 +6,7 @@
 
 const assert = require( 'assert')
 const parser = require('../dist/tidal.js')
-const queryArc = require( '../queryArc.js' )
+const queryArc = require( '../src/queryArc.js' ).queryArc
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 

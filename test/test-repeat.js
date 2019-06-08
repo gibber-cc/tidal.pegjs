@@ -6,7 +6,7 @@
 
 const assert = require( 'assert')
 const parser = require('../dist/tidal.js')
-const queryArc = require( '../queryArc.js' )
+const queryArc = require( '../src/queryArc.js' ).queryArc
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 
@@ -58,10 +58,9 @@ describe( "Testing repeats with '*'", () => {
     const result = queryArc( pattern, Fraction(0), Fraction(1) )
     assert.deepEqual( result, expected )
 
-    })
-    
+  })
 
-  it( 'should generate one events given "0/2" and a duration of 2' , () => {
+  it( 'should generate one event given "0/2" and a duration of 2' , () => {
     const expected = [
       { value:0, arc:{ start:Fraction(0), end:Fraction(2) } },
     ]
@@ -73,7 +72,7 @@ describe( "Testing repeats with '*'", () => {
 
   })
   
-  /*
+  
   it( 'should generate two events given "[0 1]/2" and a duration of 2' , () => {
     const expected = [
       { value:0, arc:{ start:Fraction(0), end:Fraction(1) } },
@@ -83,9 +82,9 @@ describe( "Testing repeats with '*'", () => {
     const pattern = parser.parse( '[0 1]/2' )
     const result = queryArc( pattern, Fraction(0), Fraction(2) )
 
-    console.log( 'result:', util.inspect( result, { depth:3 } ) )
+    //console.log( 'result:', util.inspect( result, { depth:3 } ) )
     assert.deepEqual( result, expected )
 
     })
-    */
+    
  })

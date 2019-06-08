@@ -1,5 +1,4 @@
 const Fraction = require( 'fraction.js' )
-const PQ       = require( 'priorityqueue' )
 const util     = require( 'util' )
 const log      = util.inspect
 
@@ -332,16 +331,11 @@ const handlers = {
       }else{
         speed = 1/speed
         //console.log( 'phase:', phase.mul( speed ) )
-        //events = queryArc( 
-        //  pattern.value,
-        //  phase.mul( speed ),
-        //  duration.mul( Fraction( speed ) )
-        //)
         events = processPattern( 
           pattern.value, 
           duration.mul( Fraction( speed ) ), 
           phase.mul( speed ),
-          getPhaseIncr( pattern ).mul( speed ),null,false
+          getPhaseIncr( pattern ).mul( speed ), null, false
         )
         //console.log( 'events:', log( events, { depth:4 } ) )
         // remap events to correct time spans
@@ -372,95 +366,4 @@ const handlers = {
   },
 }
 
-
-
-//events = queryArc( 
-//  { values: [ { type:'number', value:0 }, { type:'number', value:1 }], type:'group' },
-//  Fraction(0),
-//  Fraction(2)
-//)
-
-//const fastpattern = {
-//  values:[0],
-//  type: 'speed',
-//  speed: [2,3,4,8]
-//}
-
-//const slowpattern = {
-//  values:[0],
-//  type: 'slow',
-//  speed: [ Fraction(1,3) ] 
-//}
-
-//let events
-
-//events = queryArc( 
-//  { 
-//    type:'group', 
-//    values:[
-//      { type:'number', value:0 },
-//      { type:'group', values:[
-//        { type:'number', value:1 },
-//        { type:'number', value:2 }
-//      ]}
-//    ]
-//  }, 
-//  Fraction(0), 
-//  Fraction(2) 
-//)
-
-//events = queryArc( 
-//  { 
-//    type:'group', 
-//    values:[
-//      { type:'number', value:0 },
-//      { type:'group', values:[
-//        { type:'number', value:1 },
-//        { type:'number', value:2 },
-//        { type:'group', values:[
-//          { type:'number', value:3 },
-//          { type:'number', value:4 }
-//        ]}
-//      ]}
-//    ]
-//  }, 
-//  Fraction(0), 
-//  Fraction(4) 
-//)
-
-//events = queryArc( [], fastpattern, Fraction(0), Fraction(1) )
-//events = queryArc( [], slowpattern, Fraction(0), Fraction(15) )
-
-//events = queryArc( 
-//  {
-//    type:'group',
-//    values:[{ 
-//      type:'polymeter', 
-//      left: { type:'group', values:[{ type:'number', value:0 },{ type:'number', value:1 }] }, 
-//      right:{ type:'group', values:[{ type:'number', value:2 },{ type:'number', value:3 }, { type:'number', value:4 }] } 
-//    }],
-//  }, 
-//  Fraction(0), Fraction(2) 
-//)
-
-//events = queryArc( 
-//  { 
-//    type:'polymeter', 
-//    left: { type:'group', values:[{ type:'number', value:0 },{ type:'number', value:1 }] }, 
-//    right:{ type:'group', values:[{ type:'number', value:2 },{ type:'number', value:3 }, { type:'number', value:4 }] } 
-//  },
-//  Fraction(0), Fraction(2) 
-//)
-
-//PQ({
-//  comparator: ( a,b ) => a.arc.start.compare( b.arc.start ) 
-//})
-//.from( events )
-//.toArray()
-//.forEach( v => 
-//  console.log( 
-//    `${v.arc.start.toFraction()} - ${v.arc.end.toFraction()}: [ ${v.value.toString()} ]` 
-//  ) 
-//)
-
-module.exports = queryArc
+module.exports.queryArc = queryArc

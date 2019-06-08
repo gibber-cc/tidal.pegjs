@@ -1,4 +1,6 @@
 const gulp = require('gulp');
+const __browserify = require('browserify')
+const source = require( 'vinyl-source-stream' )
 
 // Contains all plugins the project depends on
 const plugins = require('gulp-load-plugins')();
@@ -15,9 +17,19 @@ function generatePeg() {
 
 // Concatenate the flatten.js file with the generated peg
 function flatten(){
-  return gulp.src(['dist/tidal.js', 'src/flatten.js'])
-    .pipe(plugins.concat('peg-parse-flatten.js'))
+  return gulp.src(['dist/tidal.js', './src/queryArc.js', './src/pattern.js' ])
+    .pipe(plugins.concat('peg-parse-query.js'))
     .pipe(gulp.dest('dist'));
+}
+
+function browserify() {
+  return __browserify({
+    entries:'./src/pattern.js',
+    standalone:'Pattern'
+  })
+  .bundle()
+  .pipe( source('tidal-pattern.js' ) )
+  .pipe( gulp.dest( 'dist' ) )
 }
 
 
@@ -49,3 +61,4 @@ gulp.task('test', gulp.series('flatten', runTests));
 gulp.task('watch', watchFiles);
 gulp.task('clean', clean);
 gulp.task('default', gulp.series('build'));
+gulp.task('browserify', gulp.series( 'build', browserify ) );

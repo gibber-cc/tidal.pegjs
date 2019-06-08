@@ -6,7 +6,7 @@
 const assert = require( 'assert')
 const parser = require('../dist/tidal.js')
 
-const queryArc = require( '../queryArc.js' )
+const queryArc = require( '../src/queryArc.js' ).queryArc
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 
@@ -69,5 +69,6 @@ describe('Testing one-step per cycle', () => {
     assert.deepEqual( parser.parse('<0 1 2, 3 4 5>'), expected )
 
   })
+
 
  })
