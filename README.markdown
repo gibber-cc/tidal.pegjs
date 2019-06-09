@@ -1,118 +1,60 @@
 tidal.pegjs
 ===
 
-`tidal.pegjs` is a parsing expression grammar for the [TidalCycles pattern language](https://tidalcycles.org/patterns.html), written using [PEG.js](http://pegjs.org). The goal of the PEG is to easily translate strings of Tidal patterns into annotated JavaScript data structures for use in sequencing.
+`tidal.pegjs` is a parsing expression grammar for the [TidalCycles pattern language](https://tidalcycles.org/patterns.html), written using [PEG.js](http://pegjs.org). The goal of the PEG is to easily translate strings of Tidal patterns into annotated JavaScript data structures for use in sequencing. The project also provides a `Pattern` object that can be queried for events by passing in a starting time and a duration.
 
 # Usage
 
-The easiest way to use this peg is by using Gulp. More details are in the *Development* section.
-
-## Parsing example outputs
+The easiest way to use this is by including the `dist/tidal-pattern.js` file in your HTML; this will provide a global `Pattern` object. To then process and query a pattern string:
 
 ```js
-'0 2 4 6' ==>
+const p = Pattern( '[0 [1 2]*4 <5 6 7> 8]' )
+
+// start at time 0 and query for 3 cycles
+const events = p.query( 0, 3 )
+// events now holds the query results, but we can also
+// call p.print to pretty-print them to the JS console.
+
+p.print()
+```
+
+There are single-file HTML examples in the `demos` folder for reference.
+
+## Parsing vs. Querying
+
+Before querying a Tidal pattern for individual events, the pattern must be *parsed*; this is the functionality that the parsing expression grammar provides. Once parsed, we have a data structure describing the pattern. For example, given the pattern `0 1 2` the PEG generates"
+
+```js
 {
-  '0': {type: 'number', value: 0},
-  '1/4': {type: 'number', value: 2},
-  '1/2': {type: 'number', value: 4},
-  '3/4': {type: 'number', value: 6},
+  values: [
+    { type: 'number', value: 0 },
+    { type: 'number', value: 1 },
+    { type: 'number', value: 2 },
+  ],
   type: 'group'
 }
 ```
-
+ 
+Once we have this data structure, we can then *query* the data for events. If we use the parsed data aboveand query it for one cycle of events, we get:
 
 ```js
-'0 [[2 3] [2 4(3,8,9) 7*2]] 5' =>
-
-{
-  '0': {type: 'number', value: 0},
-  '1/3':{
-    '0':{
-      '0': {type: 'number', value:2},
-      '1/2': {type: 'number', value: 3},
-      type: 'group'
-    },
-    '1/2': {
-      '0': {type: 'number', value: 2},
-      '1/3': {
-        value: {type: 'number', value: 4},
-        soundNum: {type: 'number', value: 3},
-        steps: {type: 'number', value: 8},
-        rotateStep: {type: 'number', value: 9},
-        type: 'euclid'
-      },
-      '2/3': {
-        type: 'repeat',
-        operator: '*',
-        repeatValue: {type: 'number', value: 2},
-        value: {type: 'number', value:7}
-      }
-    }
+[
+  {
+    value:0,
+    arc: { start: Fraction(0), end:Fraction(1,3) }
   },
-  '2/3': {type: 'number', value: 5},
-  type: 'group'
-}
-
-```
-
-## Flattening example outputs
-
-The parsed objects can be flattened to generate an output where the keys are fractions corresponding to the section of each sub-pattern in a full cycle
-
-```js
-{
-  '0': {type: 'number', value: 0},
-  '1/3': {
-    '0': {
-      '0': {type: 'number', value: 0},
-      '1/3': {type: 'number', value: 1},
-      '2/3': {type: 'number', value: 2},
-      type: 'group'
-    },
-    '1/2': {
-      '0': {type: 'number', value: 3},
-      '1/2': {type: 'number', value: 4},
-      type: 'group'
-    },
-    type: 'group'
+  {
+    value:1,
+    arc: { start: Fraction(1,3), end:Fraction(2,3) }
   },
-  '2/3': {type: 'number', value: 5},
-  type: 'group'
-}
-
-Flattened ==>
-{
-  '0': {type: 'number', value: 0},
-  '1/3': {type: 'number', value: '0'},
-  '7/18': {type: 'number', value: '1'},    
-  '4/9': {type: 'number', value: '2'},     
-  '1/2': {type: 'number', value: '3'},   
-  '7/12': {type: 'number', value: '4'},   
-  '2/3': {type: 'number', value: '5'},
-}
-```
-
-```js
-{
-  type:'repeat',
-  operator: '*',
-  repeatValue:{ type:'number', value:2 },
-  value: {
-    '0': { type:'number', value:2 },
-    '1/2': { type:'number', value:1 },
-    type: 'group'
+  {
+    value:2,
+    arc: { start: Fraction(2,3), end:Fraction(1) }
   }
-}
-
-Flattened ==>
-{
-  '0': {type: 'number', value:2},
-  '1/4': {type: 'number', value: 1},
-  '1/2': {type: 'number', value: 2},
-  '3/4': {type: 'number', value: 1},
-  type: 'group'
-}
+]
 ```
+
+Rational numbers are provided by the [fraction.js library](https://github.com/infusion/Fraction.js).
 
 # Development
 
@@ -141,25 +83,6 @@ If you want to modify any of the files you can run `gulp watch` in the backgroun
 
   For more instructions on compiling parsers, see https://pegjs.org/documentation#generating-a-parser-javascript-api.
 
-
-- Compile the **flattener**:
-  - Run `gulp flatten`
-
-  - Pass any **parsed** Tidal pattern to the flatten function as:
-
-    ```js
-
-    let flattener = require('./dist/peg-parse-flatten.js'); // Modify path to this file if necessary
-
-    flattener.flatten({
-      '0': {type: 'number', value: 0},
-      '1/3': {type: 'number', value: 1},
-      '2/3': {type: 'number', value: 2},
-      type: 'group'
-    });
-    ```
-
-  The `peg-parse-flatten.js` file can be required as a module in Node.js or in the browser using browserify, etc.
 
 - Run the mocha **tests**: `gulp test`
 - **Watch** for changes in any file or tests and run tests automatically whenever this happens: `gulp watch`
@@ -195,3 +118,6 @@ There are still some issues with this project, which can be found in the `TODO.m
 
 ## More about PEGs and musical programming languages
 Graham Wakefield and Charlie Roberts ran [a workshop on using PEGs to create musical programming languages](http://worldmaking.github.io/workshop_nime_2017/); check it out for more about how PEGs work and tutorials on creating your own mini-languages.
+
+## Credits
+This library is developed by Charlie Roberts and Mariana Pachon Puentes.
