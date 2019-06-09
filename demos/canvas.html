@@ -1,0 +1,72 @@
+<!docype html>
+<html lang='en'>
+  <head>
+    <script src='../dist/tidal-pattern.js'></script>
+    <style>
+      body { margin:0 }
+      canvas { 
+        margin-top:1.5em;
+        width:100%; 
+        height:calc(100% - 1.5em) 
+      }
+      #gui { 
+        position:absolute; 
+        left:0;
+        top:0;
+        height:1.5em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='gui'>
+      pattern:<input id='pattern' type='text' value='0 [1 2]*3 [5 <1 6 7>] 8'></input>
+      number of cycles:
+      <select id='numCycles'>
+        <option value='1'>1</option>
+        <option value='2'>2</option>
+        <option value='3'>3</option>
+        <option value='4'>4</option>
+        <option value='5' selected>5</option>
+      </select>
+      <button id='go'>visualize pattern</button>
+    </div>
+    <canvas></canvas>
+  </body>
+  <script>
+    window.onload = function() {
+      const cyclesElem  = document.querySelector( '#numCycles' )
+      const patternElem = document.querySelector( '#pattern' )
+      const canvas      = document.querySelector( 'canvas' )
+      const ctx         = canvas.getContext('2d')
+      
+      const colors      = ['red','yellow','orange','green','blue','purple','grey','pink','cyan','magenta']
+
+      const visualize = ()=> {
+        window.pattern  = Pattern( patternElem.value )
+        const duration = cyclesElem.value
+
+        const events = pattern.query( 0, duration )
+        
+        events.forEach( evt => {
+          const startTime = evt.arc.start.valueOf() / duration
+          const startPos  = startTime * canvas.width
+          const dur = evt.arc.end.sub( evt.arc.start ).valueOf() / duration
+          const color = evt.value < colors.length ? colors[ evt.value ] : 'black' 
+
+          ctx.fillStyle = color
+
+          ctx.fillRect( 
+            Math.floor( startPos ),
+            0,
+            dur * canvas.width,
+            canvas.height
+          )
+        })
+      }
+
+      document.querySelector( '#go' ).onclick = visualize
+
+      visualize()
+    }
+  </script>
+</html>
