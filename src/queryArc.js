@@ -238,7 +238,7 @@ const handlers = {
 
       state.push({ 
         arc:Arc( phase, phase.add( duration ) ), 
-        value:group.values[ group.count ].value 
+        value:group.values[ group.count % group.values.length ].value 
       })
     })
 
