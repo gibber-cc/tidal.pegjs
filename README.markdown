@@ -5,7 +5,7 @@ tidal.pegjs
 
 # Usage
 
-The easiest way to use this is by including the `dist/tidal-pattern.js` file in your HTML; this will provide a global `Pattern` object. To then process and query a pattern string:
+The easiest way to use this is by including the `dist/pattern.js` file in your HTML; this will provide a global `Pattern` object. To then process and query a pattern string:
 
 ```js
 const p = Pattern( '[0 [1 2]*4 <5 6 7> 8]' )
