@@ -28,7 +28,7 @@ function browserify() {
     standalone:'Pattern'
   })
   .bundle()
-  .pipe( source('tidal-pattern.js' ) )
+  .pipe( source('pattern.js' ) )
   .pipe( gulp.dest( 'dist' ) )
 }
 
