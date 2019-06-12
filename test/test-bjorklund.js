@@ -117,4 +117,27 @@ describe( 'Testing Euclidean rhythms.', () => {
       queryArc( pattern, Fraction(0), Fraction(1) ) 
     )
   })
+
+  // this test depends on tests in test-group.js passing
+  it( `"[0 1](2,4)" should schedule as two events with two different values.`, () => {
+    const expected = [
+      {
+        value: 0,
+        arc: { start: Fraction(0), end:Fraction(1,4) }
+      },
+      {
+        value: 1,
+        arc: { start: Fraction(1,2), end:Fraction(3,4) }
+      }
+    ]
+    
+    const pattern = parser.parse('[0 1](2,4)')
+
+    console.log( 'pattern:', util.inspect( pattern, { depth:4 }) )
+    assert.deepEqual( 
+      queryArc( pattern, Fraction(0), Fraction(1) ), 
+      expected
+    )
+  })
+
 })

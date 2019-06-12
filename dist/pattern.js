@@ -184,7 +184,7 @@ function peg$parse(input, options) {
       peg$c14 = peg$literalExpectation(")", false),
       peg$c15 = function(value, pulses, slots, rotation) {
         const result = {
-          type:'euclid',
+          type:'bjorklund',
           pulses, 
           slots, 
           value,
@@ -1874,6 +1874,47 @@ module.exports = {
 };
 
 },{}],2:[function(require,module,exports){
+function bjorklund(slots, pulses){
+  var pattern = [],
+      count = [],
+      remainder = [pulses],
+      divisor = slots - pulses,
+      level = 0,
+      build_pattern = function(lv){
+        if( lv == -1 ){ pattern.push(0); }
+        else if( lv == -2 ){ pattern.push(1); }
+        else{
+          for(var x=0; x<count[lv]; x++){
+            build_pattern(lv-1);
+          }
+
+          if(remainder[lv]){
+            build_pattern(lv-2);
+          }
+        }
+      }
+  ;
+
+  while(remainder[level] > 1){
+    count.push(Math.floor(divisor/remainder[level]));
+    remainder.push(divisor%remainder[level]);
+    divisor = remainder[level];
+    level++;
+  }
+  count.push(divisor);
+
+  build_pattern(level);
+
+  return pattern.reverse();
+}
+
+
+module.exports = function(m, k){
+  if(m > k) return bjorklund(m, k);
+  else return bjorklund(k, m);
+};
+
+},{}],3:[function(require,module,exports){
 /**
  * @license Fraction.js v4.0.12 09/09/2015
  * http://www.xarg.org/2014/03/rational-numbers-in-javascript/
@@ -2709,7 +2750,7 @@ module.exports = {
 
 })(this);
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2734,7 +2775,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -2920,14 +2961,14 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -3517,7 +3558,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":5,"_process":4,"inherits":3}],7:[function(require,module,exports){
+},{"./support/isBuffer":6,"_process":5,"inherits":4}],8:[function(require,module,exports){
 const parse = require('../dist/tidal.js').parse
 const query = require('./queryArc.js' ).queryArc
 const Fraction = require( 'fraction.js' )
@@ -3535,7 +3576,7 @@ const Pattern = patternString => {
   try{
     __data = parse( patternString )
   }catch( e ) {
-    throw `We were unable to parse the pattern ${patternString}. Error: ${e.toString()}`
+    throw `We were unable to parse the pattern ${patternString}. ${e.toString()}`
   }
 
   const ptrn = {
@@ -3573,9 +3614,10 @@ const Pattern = patternString => {
 
 module.exports = Pattern
 
-},{"../dist/tidal.js":1,"./queryArc.js":8,"fraction.js":2}],8:[function(require,module,exports){
+},{"../dist/tidal.js":1,"./queryArc.js":9,"fraction.js":3}],9:[function(require,module,exports){
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
+const bjork    = require( 'bjork' ) 
 const log      = util.inspect
 
 /* queryArc
@@ -3805,6 +3847,58 @@ const handlers = {
     return state.concat( eventList )
   },
 
+  bjorklund( state, pattern, phase, duration ) {
+    const onesAndZeros = bjork( pattern.pulses.value, pattern.slots.value )
+    let rotation = pattern.rotation !== null ? pattern.rotation.value : 0
+    
+    // rotate right
+    if( rotation > 0 ) {
+      while( rotation > 0 ) {
+        const right = onesAndZeros.pop()
+        onesAndZeros.unshift( right )
+        rotation--
+      }
+    } else if( rotation < 0 ) {
+      // rotate left
+      while( rotation < 0 ) {
+        const left = onesAndZeros.shift()
+        onesAndZeros.push( left )
+        rotation++
+      }
+    }
+    
+    const slotDuration = duration.div( pattern.slots.value )
+    const valueIsValue = pattern.value.type === 'number' || pattern.value.type === 'string'
+
+    const events = onesAndZeros.map( ( shouldInclude, i, arr ) => {
+      let evt
+      // don't process unless an actual event will be included...
+      if( shouldInclude === 1 ) {
+        const startPhase = phase.add( slotDuration.mul( i ) )
+        evt = {
+          shouldInclude,
+          value:valueIsValue ? pattern.value : processPattern( pattern.value, slotDuration, startPhase )[0],
+          arc:Arc( startPhase, startPhase.add( slotDuration ) ) 
+        }
+      }else{
+        evt = { shouldInclude }
+      }
+
+      return evt
+    })
+    .filter( evt => {
+      let shouldInclude = evt.shouldInclude
+
+      // needed to pass tests and is also cleaner...
+      delete evt.shouldInclude
+      return shouldInclude === 1
+    })
+
+    events.forEach( evt => state.push( evt ) )
+    
+    return state
+  },
+
   onestep( state, pattern, phase, duration ) {
     pattern.values.forEach( group => {
       // initialize, then increment. this assumes that the pattern will be parsed once,
@@ -3944,5 +4038,5 @@ const handlers = {
 
 module.exports.queryArc = queryArc
 
-},{"fraction.js":2,"util":6}]},{},[7])(7)
+},{"bjork":2,"fraction.js":3,"util":7}]},{},[8])(8)
 });

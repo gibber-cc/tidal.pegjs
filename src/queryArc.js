@@ -251,11 +251,26 @@ const handlers = {
     }
     
     const slotDuration = duration.div( pattern.slots.value )
-    const events = onesAndZeros.map( ( shouldInclude, i, arr ) => ({
-      shouldInclude,
-      value:pattern.value, 
-      arc:Arc( phase.add( slotDuration.mul( i ) ), phase.add( slotDuration.mul( i + 1 ) ) ) 
-    }) )
+    const valueIsValue = pattern.value.type === 'number' || pattern.value.type === 'string'
+
+    const events = onesAndZeros.map( ( shouldInclude, i, arr ) => {
+      let evt
+      // don't process unless an actual event will be included...
+      if( shouldInclude === 1 ) {
+        const startPhase = phase.add( slotDuration.mul( i ) )
+        evt = {
+          shouldInclude,
+          // XXX is there a case where we should use more than 
+          // the first value by querying the value pattern?
+          value:valueIsValue ? pattern.value : processPattern( pattern.value, slotDuration, startPhase )[0].value,
+          arc:Arc( startPhase, startPhase.add( slotDuration ) ) 
+        }
+      }else{
+        evt = { shouldInclude }
+      }
+
+      return evt
+    })
     .filter( evt => {
       let shouldInclude = evt.shouldInclude
 
