@@ -3877,7 +3877,9 @@ const handlers = {
         const startPhase = phase.add( slotDuration.mul( i ) )
         evt = {
           shouldInclude,
-          value:valueIsValue ? pattern.value : processPattern( pattern.value, slotDuration, startPhase )[0],
+          // XXX is there a case where we should use more than 
+          // the first value by querying the value pattern?
+          value:valueIsValue ? pattern.value : processPattern( pattern.value, slotDuration, startPhase )[0].value,
           arc:Arc( startPhase, startPhase.add( slotDuration ) ) 
         }
       }else{
