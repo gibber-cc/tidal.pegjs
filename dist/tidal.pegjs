@@ -52,10 +52,10 @@ group "group" = _ '[' _ values:term+ _ ']' _ {
 }
 
 
-// // bjorklund
+// bjorklund
 euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term _ ')'? ','? _ rotation:term* _ ')'? {
   const result = {
-    type:'euclid',
+    type:'bjorklund',
     pulses, 
     slots, 
     value,

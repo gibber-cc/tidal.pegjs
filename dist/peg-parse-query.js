@@ -183,7 +183,7 @@ function peg$parse(input, options) {
       peg$c14 = peg$literalExpectation(")", false),
       peg$c15 = function(value, pulses, slots, rotation) {
         const result = {
-          type:'euclid',
+          type:'bjorklund',
           pulses, 
           slots, 
           value,
@@ -1874,6 +1874,7 @@ module.exports = {
 
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
+const bjork    = require( 'bjork' ) 
 const log      = util.inspect
 
 /* queryArc
@@ -2103,6 +2104,46 @@ const handlers = {
     return state.concat( eventList )
   },
 
+  bjorklund( state, pattern, phase, duration ) {
+    console.log( 'bjorklund pattern:', pattern )
+    const onesAndZeros = bjork( pattern.pulses.value, pattern.slots.value )
+    let rotation = pattern.rotation !== null ? pattern.rotation.value : 0
+    
+    // rotate right
+    if( rotation > 0 ) {
+      while( rotation > 0 ) {
+        const right = onesAndZeros.pop()
+        onesAndZeros.unshift( right )
+        rotation--
+      }
+    } else if( rotation < 0 ) {
+      // rotate left
+      while( rotation < 0 ) {
+        const left = onesAndZeros.shift()
+        onesAndZeros.push( left )
+        rotation++
+      }
+    }
+    
+    const slotDuration = duration.div( pattern.slots.value )
+    const events = onesAndZeros.map( ( shouldInclude, i, arr ) => ({
+      shouldInclude,
+      value:pattern.value, 
+      arc:Arc( phase.add( slotDuration.mul( i ) ), phase.add( slotDuration.mul( i + 1 ) ) ) 
+    }) )
+    .filter( evt => {
+      let shouldInclude = evt.shouldInclude
+
+      // needed to pass tests and is also cleaner...
+      delete evt.shouldInclude
+      return shouldInclude === 1
+    })
+
+    events.forEach( evt => state.push( evt ) )
+    
+    return state
+  },
+
   onestep( state, pattern, phase, duration ) {
     pattern.values.forEach( group => {
       // initialize, then increment. this assumes that the pattern will be parsed once,
@@ -2112,7 +2153,7 @@ const handlers = {
 
       state.push({ 
         arc:Arc( phase, phase.add( duration ) ), 
-        value:group.values[ group.count ] 
+        value:group.values[ group.count % group.values.length ].value 
       })
     })
 
@@ -2259,7 +2300,7 @@ const Pattern = patternString => {
   try{
     __data = parse( patternString )
   }catch( e ) {
-    throw `We were unable to parse the pattern ${patternString}. Error: ${e.toString()}`
+    throw `We were unable to parse the pattern ${patternString}. ${e.toString()}`
   }
 
   const ptrn = {

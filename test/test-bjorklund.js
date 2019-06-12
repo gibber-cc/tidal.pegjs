@@ -6,6 +6,9 @@
 
 const assert = require( 'assert')
 const parser = require('../dist/tidal.js')
+const queryArc = require( '../src/queryArc.js' ).queryArc
+const Fraction = require( 'fraction.js' )
+const util     = require( 'util' )
 
 describe( 'Testing Euclidean rhythms.', () => {
 
@@ -15,7 +18,7 @@ describe( 'Testing Euclidean rhythms.', () => {
       pulses:{ type:'number', value:3  },
       slots: { type:'number', value:8  },
       rotation: null,
-      type:  'euclid'
+      type:  'bjorklund'
     }
 
     const result = parser.parse( '60(3,8)' )
@@ -30,13 +33,13 @@ describe( 'Testing Euclidean rhythms.', () => {
       pulses:{
         type:'group',
         values:[
-         { type:'number', value:3 },
-         { type:'number', value:5 }
+          { type:'number', value:3 },
+          { type:'number', value:5 }
         ]
       },
       slots: { type:'number', value:8  },
       rotation: null,
-      type: 'euclid'
+      type: 'bjorklund'
     }
 
     const result = parser.parse( '60( [3 5],8 )' )
@@ -47,11 +50,11 @@ describe( 'Testing Euclidean rhythms.', () => {
 
   it( 'should generate a euclidean rhythm with a rotation', () => {
     const group ={
-      value: { type:'number', value:60 },
+      value:  { type:'number', value:60 },
       pulses: { type:'number', value:5 },
-      slots: { type:'number', value:8  },
+      slots:  { type:'number', value:8  },
       rotation: {type: 'number', value:2},
-      type:  'euclid'
+      type:  'bjorklund'
     }
 
     const result = parser.parse( '60( 5,8,2 )' )
@@ -59,4 +62,59 @@ describe( 'Testing Euclidean rhythms.', () => {
     assert.deepEqual( group, result )
   })
 
+  it( `"0(1,2)" should schedule as one event, from 0 and 1/2`, () => {
+    const expected = [
+      {
+        value:{ type:'number', value:0 },
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      }
+    ]
+    
+    const pattern = parser.parse('0(1,2)')
+
+    assert.deepEqual( 
+      expected, 
+      queryArc( pattern, Fraction(0), Fraction(1) ) 
+    )
+  })
+
+  it( `"0(2,2)" should schedule as two events.`, () => {
+    const expected = [
+      {
+        value:{ type:'number', value:0 },
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      },
+      {
+        value:{ type:'number', value:0 },
+        arc: { start: Fraction(1,2), end:Fraction(1) }
+      }
+    ]
+    
+    const pattern = parser.parse('0(2,2)')
+
+    assert.deepEqual( 
+      expected, 
+      queryArc( pattern, Fraction(0), Fraction(1) ) 
+    )
+  })
+
+  it( `"0(2,4)" should schedule as two events with duration 1/4.`, () => {
+    const expected = [
+      {
+        value:{ type:'number', value:0 },
+        arc: { start: Fraction(0), end:Fraction(1,4) }
+      },
+      {
+        value:{ type:'number', value:0 },
+        arc: { start: Fraction(1,2), end:Fraction(3,4) }
+      }
+    ]
+    
+    const pattern = parser.parse('0(2,4)')
+
+    assert.deepEqual( 
+      expected, 
+      queryArc( pattern, Fraction(0), Fraction(1) ) 
+    )
+  })
 })

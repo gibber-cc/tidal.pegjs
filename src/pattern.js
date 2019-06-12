@@ -15,7 +15,7 @@ const Pattern = patternString => {
   try{
     __data = parse( patternString )
   }catch( e ) {
-    throw `We were unable to parse the pattern ${patternString}. Error: ${e.toString()}`
+    throw `We were unable to parse the pattern ${patternString}. ${e.toString()}`
   }
 
   const ptrn = {

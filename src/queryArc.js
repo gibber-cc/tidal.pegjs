@@ -1,5 +1,6 @@
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
+const bjork    = require( 'bjork' ) 
 const log      = util.inspect
 
 /* queryArc
@@ -227,6 +228,45 @@ const handlers = {
     })
    
     return state.concat( eventList )
+  },
+
+  bjorklund( state, pattern, phase, duration ) {
+    const onesAndZeros = bjork( pattern.pulses.value, pattern.slots.value )
+    let rotation = pattern.rotation !== null ? pattern.rotation.value : 0
+    
+    // rotate right
+    if( rotation > 0 ) {
+      while( rotation > 0 ) {
+        const right = onesAndZeros.pop()
+        onesAndZeros.unshift( right )
+        rotation--
+      }
+    } else if( rotation < 0 ) {
+      // rotate left
+      while( rotation < 0 ) {
+        const left = onesAndZeros.shift()
+        onesAndZeros.push( left )
+        rotation++
+      }
+    }
+    
+    const slotDuration = duration.div( pattern.slots.value )
+    const events = onesAndZeros.map( ( shouldInclude, i, arr ) => ({
+      shouldInclude,
+      value:pattern.value, 
+      arc:Arc( phase.add( slotDuration.mul( i ) ), phase.add( slotDuration.mul( i + 1 ) ) ) 
+    }) )
+    .filter( evt => {
+      let shouldInclude = evt.shouldInclude
+
+      // needed to pass tests and is also cleaner...
+      delete evt.shouldInclude
+      return shouldInclude === 1
+    })
+
+    events.forEach( evt => state.push( evt ) )
+    
+    return state
   },
 
   onestep( state, pattern, phase, duration ) {
