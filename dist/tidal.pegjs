@@ -1,23 +1,5 @@
-{
-
-  function parseToObject( body ){
-    const cycleBody = {}
-
-    cycleBody.values = body
-    cycleBody.type = 'group'
-
-    /*console.log( 'body:', body.type, body.values, body )*/
-    return body 
-  }
-}
-
-pattern =  euclid / repeat / layer / group / list / onestep / polymeter / term 
-
-// generic term for matching in groups
-term "term" = body:(
-  polymeter / layer / degrade / repeat / feet / group / euclid  / number / word / rest / onestep
-) _ {return body}
-
+// XXX the ordering here is very important... list must be before euclid, repeat etc.
+pattern =  list / euclid / repeat / layer / group / onestep / polymeter / term 
 
 // a list (which is a group)
 list = _ _valuesstart:term _ _valuesend:term+ _ {
@@ -40,7 +22,6 @@ list = _ _valuesstart:term _ _valuesend:term+ _ {
   return out
 }
 
-
 // a group
 group "group" = _ '[' _ values:term+ _ ']' _ {
   const out = {
@@ -51,6 +32,10 @@ group "group" = _ '[' _ values:term+ _ ']' _ {
   return out 
 }
 
+// generic term for matching in groups
+term "term" = body:(
+  polymeter / layer / degrade / repeat / feet / group / euclid  / number / letter / word / rest / onestep 
+) _ {return body}
 
 // bjorklund
 euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term _ ')'? ','? _ rotation:term* _ ')'? {
@@ -65,7 +50,7 @@ euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term _ ')'? ','? _ rota
   return result
 }
 // avoid left-recursions
-noteuclid = body:( group / number / word / rest / onestep) _ { return body }
+noteuclid = body:( group / number / letter /  word / rest / onestep) _ { return body }
 
 
 // degrading individual values
@@ -73,7 +58,7 @@ degrade = value:notdegrade '?' {
   return { type:'degrade', value }
 }
 // avoid left-recursions
-notdegrade = body:( repeat / euclid / group / number / word / onestep) _ { return body }
+notdegrade = body:( repeat / euclid / group / number / letter / word / onestep) _ { return body }
 
 
 // match a binary operation, a la 4*2, or [0 1]*4
@@ -81,7 +66,9 @@ repeat = value:notrepeat _ operator:op  _ rate:term {
   return { type:'repeat', operator, rate, value }
 }
 // avoid left-recursions
-notrepeat = body:(euclid / polymeter / group / number / word / rest /onestep) _ { return body }
+notrepeat = body:(euclid / polymeter / group / number / letter / word / rest /onestep) _ { return body }
+
+
 
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
   const result = { 
@@ -132,7 +119,7 @@ foot = value:notfoot+ dot _ {
   return value
 }
 // avoid left-recursions
-notfoot = degrade / polymeter / rest / repeat / euclid / group / number / word / onestep
+notfoot = degrade / polymeter / rest / repeat / euclid / group / number / letter / word / onestep
 
 
 // basically, get each list and push into an array while leaving out whitespace
@@ -155,7 +142,7 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
 
   return result
 }
-notlayer = body:(list / euclid / polymeter / group / number / word / rest / onestep) _ { return body }
+notlayer = body:(list / euclid / polymeter / group / number / letter / word / rest / onestep) _ { return body }
 
 
 // One-step
@@ -171,11 +158,14 @@ onestep = '<' _ body:notonestep ','? end:notonestep? _ '>' {
 
   return onestep 
 }
-notonestep = body:(list / euclid / polymeter / group / number / word / rest / layer) _ { return body }
+notonestep = body:(list / euclid / polymeter / group / number / letter / word / rest / layer) _ { return body }
 
-
-word "word" = _ value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '.' '~' '?' ',' '>' '<']+ _ {
+word "word" = _ value:$[letter number]+ _ {
   return { type:typeof value, value }
+}
+
+letter = _ value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '.' '~' '?' ',' '>' '<'] _ {
+  return { type:'string', value }
 }
 
 // match tidal operators

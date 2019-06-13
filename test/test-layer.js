@@ -43,10 +43,10 @@ describe( 'Testing layers.', () => {
   it( 'Querying layers of different lengths should return polyrhythms.', () => {
 
     const expected = [
-      { value:0, arc:{ start:Fraction(0), end:Fraction(1,3) } },
+      { value:0, arc:{ start:Fraction(0),   end:Fraction(1,3) } },
       { value:1, arc:{ start:Fraction(1,3), end:Fraction(2,3) } },
       { value:2, arc:{ start:Fraction(2,3), end:Fraction(1) } },
-      { value:3, arc:{ start:Fraction(0), end:Fraction(1,2) } },
+      { value:3, arc:{ start:Fraction(0),   end:Fraction(1,2) } },
       { value:4, arc:{ start:Fraction(1,2), end:Fraction(1) } }
     ]
 

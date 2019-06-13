@@ -42,7 +42,7 @@ describe( 'Testing parsing literals.', () => {
     )
   })
 
-  it( `"0" should schedule as two events, at time 0 and with duration 2.`, () => {
+  it( `"0" should schedule as two events over two cycles.`, () => {
     const expected = [{
       value:0,
       arc: { start: Fraction(0), end:Fraction(1) }
@@ -59,6 +59,23 @@ describe( 'Testing parsing literals.', () => {
     )
   })
 
+  it( `"0 1" should schedule as two events over one cycle.`, () => {
+    const expected = [{
+      value:0,
+      arc: { start: Fraction(0), end:Fraction(1,2) }
+    },{
+      value:1,
+      arc: { start: Fraction(1,2), end:Fraction(1) }
+    }]
+    
+    const pattern = parser.parse('0 1')
+
+    assert.deepEqual( 
+      queryArc( pattern, Fraction(0), Fraction(1) ), 
+      expected
+    )
+  })
+
   it( `"a" should schedule as one event, at time 0 and with duration 1.`, () => {
     const expected = [{
       value:'a',
@@ -66,6 +83,26 @@ describe( 'Testing parsing literals.', () => {
     }]
     
     const pattern = parser.parse('a')
+
+    assert.deepEqual( 
+      queryArc( pattern, Fraction(0), Fraction(1) ), 
+      expected
+    )
+  })
+
+  it( `"x o" should schedule as two events, at times 0 and 1/2..`, () => {
+    const expected = [
+      {
+        value:'x',
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      },
+      {
+        value:'o',
+        arc: { start: Fraction(1,2), end:Fraction(1) }
+      }
+    ]
+    
+    const pattern = parser.parse('x o')
 
     assert.deepEqual( 
       queryArc( pattern, Fraction(0), Fraction(1) ), 

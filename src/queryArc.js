@@ -201,12 +201,13 @@ const handlers = {
       const dur = calculateDuration( phase, phaseIncr, end )
 
       // if value is not a numeric or string constant (if it's a pattern)...
-      if( member === undefined || isNaN( member.value ) ) {
+      if( member === undefined || (isNaN( member.value ) && typeof member.value !== 'string') ) {
         // query the pattern and remap time values appropriately 
         if( member !== undefined ) member.parent = pattern
         const events = processPattern( member, dur, phase.clone(), phaseIncr, null, shouldRemap( member ) )
         eventList = eventList.concat( events )
       }else{
+        // member does not need further processing, so add to event list
         eventList.push({ 
           value:member.value, 
           arc:Arc( phase, phase.add( dur ) ),

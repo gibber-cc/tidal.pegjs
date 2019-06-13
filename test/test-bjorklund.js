@@ -133,7 +133,7 @@ describe( 'Testing Euclidean rhythms.', () => {
     
     const pattern = parser.parse('[0 1](2,4)')
 
-    console.log( 'pattern:', util.inspect( pattern, { depth:4 }) )
+    //console.log( 'pattern:', util.inspect( pattern, { depth:4 }) )
     assert.deepEqual( 
       queryArc( pattern, Fraction(0), Fraction(1) ), 
       expected

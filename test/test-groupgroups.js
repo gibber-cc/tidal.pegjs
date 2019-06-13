@@ -51,6 +51,30 @@ describe( 'Testing group groups and nested group groups.', () => {
     assert.deepEqual( result, expected )
   })
 
+  // edge case-ish
+  it( 'Starting with subgroup but ending with literal parses', () => {
+    const expected =
+    {
+      values:[
+        {
+          values:[
+            { type: 'number', value: 1 },
+            { type: 'number', value: 2 },
+            { type: 'number', value: 3 },
+          ],
+          type: 'group'
+        },
+      
+        { type: 'number', value: 4 },
+      ],
+      type: 'group'
+    }
+
+    const result = parser.parse( '[1 2 3] 4' )
+
+    assert.deepEqual( result, expected )
+  })
+
   it( 'Testing nested groups three levels deep.', () => {
     const expected = {
       type:'group',

@@ -14,7 +14,6 @@ function generatePeg() {
     .pipe(gulp.dest('dist'));
 }
 
-
 // Concatenate the flatten.js file with the generated peg
 function flatten(){
   return gulp.src(['dist/tidal.js', './src/queryArc.js', './src/pattern.js' ])
@@ -31,7 +30,6 @@ function browserify() {
   .pipe( source('pattern.js' ) )
   .pipe( gulp.dest( 'dist' ) )
 }
-
 
 // Run tests
 function runTests(){
