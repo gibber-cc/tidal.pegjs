@@ -22,7 +22,17 @@ describe( 'Testing degradation.', () => {
 
     assert.deepEqual( expected, result )
   })
+  it( 'should degrade a multi-digit number when followed by a question mark.', () => {
 
+    const expected = {
+      type: 'degrade',
+      value: {type: 'number', value: 100}
+    }
+
+    const result = parser.parse( '100?' )
+
+    assert.deepEqual( expected, result )
+  })
 
   it( 'should degrade distinct numbers in pattern when followed by a question mark.', () => {
     const expected = {

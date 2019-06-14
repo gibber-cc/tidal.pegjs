@@ -24,9 +24,51 @@ describe( "Testing repeats with '*'", () => {
     const result = parser.parse( '0*2' )
 
     assert.deepEqual(result, expected)
-
   })
 
+  it( 'rule is not greedy.', () => {
+    const result = parser.parse( '0*2 3' )
+
+    return result !== undefined
+  })
+
+  it( 'should generate a 2x repeat on a string.', () => {
+
+    const expected = {
+      type: 'repeat',
+      operator:'*',
+      rate: { type: 'number', value: 2 },
+      value: { type:'string', value:'a' }
+    }
+
+    const result = parser.parse( 'a*2' )
+
+    assert.deepEqual(result, expected)
+  })
+  it( 'should generate a 2x repeat on a multi-digit number.', () => {
+    const expected = {
+      type: 'repeat',
+      operator:'*',
+      rate: { type: 'number', value:2 },
+      value: { type:'number', value:100 }
+    }
+
+    const result = parser.parse( '100*2' )
+
+    assert.deepEqual(result, expected)
+  })
+  it( 'should generate a 2x repeat on a multi-letter string.', () => {
+    const expected = {
+      type: 'repeat',
+      operator:'*',
+      rate: { type: 'number', value:2 },
+      value: { type:'string', value:'kd' }
+    }
+
+    const result = parser.parse( 'kd*2' )
+
+    assert.deepEqual(result, expected)
+  })
 
   it( 'should generate a 2x repeat on a group pattern', () => {
     const expected = {

@@ -11,8 +11,107 @@ const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 
 describe( 'Testing layers.', () => {
+  it( 'A comma should return two numbers as layers', () => {
 
-  it( 'Commas should return a groups marked as part of layers (polyrhythms)', () => {
+    const expected = {
+      type:'layers',
+      values:[
+        {
+          type:'group',
+          values:[
+            { type:'number', value:0 },
+          ]
+        },
+        {
+          type:'group',
+          values:[
+            { type:'number', value:1 },
+          ]
+        },
+      ]
+    }
+
+    const result = parser.parse( '0,1' )
+
+    assert.deepEqual( result, expected )
+  })
+
+  it( 'A comma should return two multi-digit numbers as layers', () => {
+
+    const expected = {
+      type:'layers',
+      values:[
+        {
+          type:'group',
+          values:[
+            { type:'number', value:10 },
+          ]
+        },
+        {
+          type:'group',
+          values:[
+            { type:'number', value:11 },
+          ]
+        },
+      ]
+    }
+
+    const result = parser.parse( '10,11' )
+
+    assert.deepEqual( result, expected )
+  })
+
+  it( 'A comma should return two letters as layers', () => {
+
+    const expected = {
+      type:'layers',
+      values:[
+        {
+          type:'group',
+          values:[
+            { type:'string', value:'a' },
+          ]
+        },
+        {
+          type:'group',
+          values:[
+            { type:'string', value:'b' },
+          ]
+        },
+      ]
+    }
+
+    const result = parser.parse( 'a,b' )
+
+    assert.deepEqual( result, expected )
+  })
+
+  it( 'A comma should return two multi-character words as layers', () => {
+
+    const expected = {
+      type:'layers',
+      values:[
+        {
+          type:'group',
+          values:[
+            { type:'string', value:'kd' },
+          ]
+        },
+        {
+          type:'group',
+          values:[
+            { type:'string', value:'sd' },
+          ]
+        },
+      ]
+    }
+
+    const result = parser.parse( 'kd,sd' )
+
+    assert.deepEqual( result, expected )
+  })
+
+  it( 'Commas should return groups marked as part of layers (polyrhythms)', () => {
 
     const expected = {
       type:'layers',

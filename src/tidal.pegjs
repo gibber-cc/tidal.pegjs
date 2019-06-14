@@ -33,8 +33,11 @@ group "group" = _ '[' _ values:term+ _ ']' _ {
 }
 
 // generic term for matching in groups
+// XXX The ordering here is really important. For example, degrade needs to be parsed before
+// number, otherwise the number is parsed and you're left with a ? This ordering passes all tests
+// but might need to be tweaked.
 term "term" = body:(
-  polymeter / layer / degrade / repeat / feet / group / euclid  / number / letter / word / rest / onestep 
+  repeat / degrade / feet / number / letters / word / polymeter  /  group / euclid  / letter / rest / onestep 
 ) _ {return body}
 
 // bjorklund
@@ -58,17 +61,15 @@ degrade = value:notdegrade '?' {
   return { type:'degrade', value }
 }
 // avoid left-recursions
-notdegrade = body:( repeat / euclid / group / number / letter / word / onestep) _ { return body }
+notdegrade = body:( number / repeat / euclid / group / letter / onestep ) _ { return body }
 
 
 // match a binary operation, a la 4*2, or [0 1]*4
-repeat = value:notrepeat _ operator:op  _ rate:term {
+repeat = value:notrepeat _ operator:op  _ rate:number _ {
   return { type:'repeat', operator, rate, value }
 }
-// avoid left-recursions
-notrepeat = body:(euclid / polymeter / group / number / letter / word / rest /onestep) _ { return body }
-
-
+// avoid left-recursions; must parse number before letters!
+notrepeat = body:(euclid / polymeter / number / letters /group / letter /  rest /onestep) _ { return body }
 
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
   const result = { 
@@ -121,18 +122,30 @@ foot = value:notfoot+ dot _ {
 // avoid left-recursions
 notfoot = degrade / polymeter / rest / repeat / euclid / group / number / letter / word / onestep
 
-
 // basically, get each list and push into an array while leaving out whitespace
 // and commas
-layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
+layer = _ '['? _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'? _ {
   const values = []
 
   for( let i = 0; i < body.length; i++ ) {
-  	values.push( body[ i ][ 0 ] )
-    values[ values.length - 1 ].type = 'group'
+    let value = body[ i ][ 0 ]
+    if( value.type === 'number' || value.type === 'string' ) {
+      value = {
+        type:'group',
+        values:[ value ]
+      }
+    }else{
+      value.type = 'group'
+    }
+  	values.push( value )
   }
 
-  end.type = 'group'
+  if( end.type === 'number' || end.type === 'string' ) {
+    end = { type:'group', values:[ end ] }
+  }else{
+    end.type = 'group'
+  }
+
   values.push( end )
 
   const result = {
@@ -142,7 +155,7 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'_ {
 
   return result
 }
-notlayer = body:(list / euclid / polymeter / group / number / letter / word / rest / onestep) _ { return body }
+notlayer = body:( list / number / letters / euclid / polymeter / group / letter / rest / onestep) _ { return body }
 
 
 // One-step
@@ -158,13 +171,17 @@ onestep = '<' _ body:notonestep ','? end:notonestep? _ '>' {
 
   return onestep 
 }
-notonestep = body:(list / euclid / polymeter / group / number / letter / word / rest / layer) _ { return body }
+notonestep = body:(list / euclid / polymeter / word / group / number / letter /  rest / layer) _ { return body }
 
-word "word" = _ value:$[letter number]+ _ {
+word "word" = _ value:$[letter number]+ _ { 
   return { type:typeof value, value }
 }
 
-letter = _ value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '.' '~' '?' ',' '>' '<'] _ {
+letters = _ l:letter+ _ {
+  return { type:'string', value:text().trim() }
+}
+
+letter =  value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '.' '~' '?' ',' '>' '<' ]  {
   return { type:'string', value }
 }
 

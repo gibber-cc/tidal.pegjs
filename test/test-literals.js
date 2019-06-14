@@ -20,12 +20,31 @@ describe( 'Testing parsing literals.', () => {
     assert.deepEqual( expected, result )
   })
 
+  // single digit
   it ('"0" should parse to a number.', () => {
     const expected = { type: 'number', value: '0' }
 
     const result = parser.parse( '0' )
 
     assert.deepEqual( expected, result )
+  })
+
+  // testing multiple digits in one number
+  it ('"100" should parse to a number.', () => {
+    const expected = { type: 'number', value: '100' }
+
+    const result = parser.parse( '100' )
+
+    assert.deepEqual( expected, result )
+  })
+
+  // multiple letters in one word
+  it( `"kd" should parse as one literal.`, () => {
+    const expected = { type: 'string', value: 'kd' }
+
+    const result = parser.parse( 'kd' )
+
+    assert.deepEqual( result, expected )
   })
 
   it( `"0" should schedule as one event, at time 0 and with duration 1.`, () => {
@@ -90,7 +109,7 @@ describe( 'Testing parsing literals.', () => {
     )
   })
 
-  it( `"x o" should schedule as two events, at times 0 and 1/2..`, () => {
+    it( `"x o" should schedule as two events, at times 0 and 1/2..`, () => {
     const expected = [
       {
         value:'x',
