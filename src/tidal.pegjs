@@ -124,7 +124,7 @@ notfoot = degrade / polymeter / rest / repeat / euclid / group / number / letter
 
 // basically, get each list and push into an array while leaving out whitespace
 // and commas
-layer = _ '['? _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'? _ {
+layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']' _ {
   const values = []
 
   for( let i = 0; i < body.length; i++ ) {
