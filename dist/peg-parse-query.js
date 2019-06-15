@@ -468,11 +468,11 @@ function peg$parse(input, options) {
 
     s0 = peg$parselist();
     if (s0 === peg$FAILED) {
-      s0 = peg$parseeuclid();
+      s0 = peg$parselayer();
       if (s0 === peg$FAILED) {
-        s0 = peg$parserepeat();
+        s0 = peg$parseeuclid();
         if (s0 === peg$FAILED) {
-          s0 = peg$parselayer();
+          s0 = peg$parserepeat();
           if (s0 === peg$FAILED) {
             s0 = peg$parsegroup();
             if (s0 === peg$FAILED) {
@@ -633,23 +633,26 @@ function peg$parse(input, options) {
       if (s1 === peg$FAILED) {
         s1 = peg$parsefeet();
         if (s1 === peg$FAILED) {
-          s1 = peg$parsenumber();
+          s1 = peg$parselayer();
           if (s1 === peg$FAILED) {
-            s1 = peg$parseletters();
+            s1 = peg$parsenumber();
             if (s1 === peg$FAILED) {
-              s1 = peg$parseword();
+              s1 = peg$parseletters();
               if (s1 === peg$FAILED) {
-                s1 = peg$parsepolymeter();
+                s1 = peg$parseword();
                 if (s1 === peg$FAILED) {
-                  s1 = peg$parsegroup();
+                  s1 = peg$parsepolymeter();
                   if (s1 === peg$FAILED) {
-                    s1 = peg$parseeuclid();
+                    s1 = peg$parsegroup();
                     if (s1 === peg$FAILED) {
-                      s1 = peg$parseletter();
+                      s1 = peg$parseeuclid();
                       if (s1 === peg$FAILED) {
-                        s1 = peg$parserest();
+                        s1 = peg$parseletter();
                         if (s1 === peg$FAILED) {
-                          s1 = peg$parseonestep();
+                          s1 = peg$parserest();
+                          if (s1 === peg$FAILED) {
+                            s1 = peg$parseonestep();
+                          }
                         }
                       }
                     }
@@ -1279,9 +1282,6 @@ function peg$parse(input, options) {
         s2 = peg$FAILED;
         if (peg$silentFails === 0) { peg$fail(peg$c3); }
       }
-      if (s2 === peg$FAILED) {
-        s2 = null;
-      }
       if (s2 !== peg$FAILED) {
         s3 = peg$parse_();
         if (s3 !== peg$FAILED) {
@@ -1370,9 +1370,6 @@ function peg$parse(input, options) {
                 } else {
                   s7 = peg$FAILED;
                   if (peg$silentFails === 0) { peg$fail(peg$c5); }
-                }
-                if (s7 === peg$FAILED) {
-                  s7 = null;
                 }
                 if (s7 !== peg$FAILED) {
                   s8 = peg$parse_();
@@ -2314,8 +2311,9 @@ const handlers = {
     //pattern.left.parent = pattern.right.parent = pattern
     for( const group of pattern.values ) {
       const incr = getPhaseIncr( group )
+      console.log( 'group:', group.values )
       state = state.concat(
-        processPattern( group, duration, phase.clone(), incr, incr, false )
+        processPattern( group, duration.clone(), phase.clone(), incr, incr, false )
       )
     }
 

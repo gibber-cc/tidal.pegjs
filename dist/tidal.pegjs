@@ -1,5 +1,5 @@
 // XXX the ordering here is very important... list must be before euclid, repeat etc.
-pattern =  list / euclid / repeat / layer / group / onestep / polymeter / term 
+pattern =  list / layer / euclid / repeat / group / onestep / polymeter / term 
 
 // a list (which is a group)
 list = _ _valuesstart:term _ _valuesend:term+ _ {
@@ -37,7 +37,7 @@ group "group" = _ '[' _ values:term+ _ ']' _ {
 // number, otherwise the number is parsed and you're left with a ? This ordering passes all tests
 // but might need to be tweaked.
 term "term" = body:(
-  repeat / degrade / feet / number / letters / word / polymeter  /  group / euclid  / letter / rest / onestep 
+  repeat / degrade / feet / layer / number / letters / word / polymeter / group / euclid  / letter / rest / onestep 
 ) _ {return body}
 
 // bjorklund
@@ -124,7 +124,7 @@ notfoot = degrade / polymeter / rest / repeat / euclid / group / number / letter
 
 // basically, get each list and push into an array while leaving out whitespace
 // and commas
-layer = _ '['? _ body:(notlayer _ ',' _ )+ end:notlayer _ ']'? _ {
+layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']' _ {
   const values = []
 
   for( let i = 0; i < body.length; i++ ) {

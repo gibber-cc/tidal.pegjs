@@ -143,7 +143,7 @@ const getIndex = ( pattern, phase ) => {
 // in addition to 'fast', phase resets are also necessary when indexing subpatterns,
 // which are currently arrays with no defined .type property, hence the inclusion of
 // undefined in the array below
-const shouldResetPhase = [ 'repeat', undefined, 'group' ] 
+const shouldResetPhase = [ 'repeat', undefined, 'group', 'layers' ] 
 
 // XXX does these need to look at all parents recursively? Right now we're only using one generation...
 const shouldReset = pattern => {
@@ -338,9 +338,16 @@ const handlers = {
     //pattern.left.parent = pattern.right.parent = pattern
     for( const group of pattern.values ) {
       const incr = getPhaseIncr( group )
-      state = state.concat(
-        processPattern( group, duration, phase.clone(), incr, incr, false )
+      const events = processPattern( group, duration.clone(), phase.clone(), incr, incr, false)
+      // not sure why excess events are generated, but they need to be filtered...
+      .filter( evt => 
+        evt.arc.start.valueOf() >= phase.valueOf() 
+        && evt.arc.start.valueOf() < phase.add( duration ).valueOf()
       )
+      
+      //console.log( 'group:', util.inspect( group, { depth:3 }) )
+      //console.log( 'state:', util.inspect( events, { depth:3 }))
+      state = state.concat( events )
     }
 
     return state
