@@ -375,20 +375,24 @@ const handlers = {
       if( pattern.operator === '*' ) {
         events = queryArc( 
           pattern.value,
-          Fraction( 0 ), 
-          Fraction( speed )
+          phase.clone(), //Fraction( 0 ), 
+          Fraction( speed ).mul( duration )
         )
+        //events = processPattern(
+        //  pattern.value,
+        //  incr.mul( speed ),
+        //  phase.clone() )
+          
         // remap events to correct time spans
         .map( evt => {
-          evt.arc.start = evt.arc.start.div( speed )
-          evt.arc.end   = evt.arc.end.div( speed )
+          evt.arc.start = evt.arc.start.div( speed ).add( phase )
+          evt.arc.end   = evt.arc.end.div( speed ).add( phase )
           return evt
         })
-        // remove events don't fall  in the current window
-        .filter( evt => 
-          evt.arc.start.compare( incr.mul( i ) ) >= 0 
-            && evt.arc.start.compare( incr.mul( i+1 ) ) < 0 
-        )
+        //.filter( evt => 
+        //  evt.arc.start.compare( incr.mul( i ) ) >= 0 
+        //    && evt.arc.start.compare( incr.mul( i+1 ) ) < 0 
+        //))
         // add to previous events
         .concat( events )
       }else{

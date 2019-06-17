@@ -260,7 +260,7 @@ function peg$parse(input, options) {
               values:[ value ]
             }
           }else{
-            value.type = 'group'
+            /*value.type = 'group'*/
           }
         	values.push( value )
         }
@@ -268,7 +268,7 @@ function peg$parse(input, options) {
         if( end.type === 'number' || end.type === 'string' ) {
           end = { type:'group', values:[ end ] }
         }else{
-          end.type = 'group'
+          /*end.type = 'group'*/
         }
 
         values.push( end )
@@ -949,7 +949,7 @@ function peg$parse(input, options) {
         if (s3 !== peg$FAILED) {
           s4 = peg$parse_();
           if (s4 !== peg$FAILED) {
-            s5 = peg$parsenumber();
+            s5 = peg$parsenotrepeat();
             if (s5 !== peg$FAILED) {
               s6 = peg$parse_();
               if (s6 !== peg$FAILED) {
@@ -1417,23 +1417,26 @@ function peg$parse(input, options) {
     var s0, s1, s2;
 
     s0 = peg$currPos;
-    s1 = peg$parselist();
+    s1 = peg$parserepeat();
     if (s1 === peg$FAILED) {
-      s1 = peg$parsenumber();
+      s1 = peg$parselist();
       if (s1 === peg$FAILED) {
-        s1 = peg$parseletters();
+        s1 = peg$parsenumber();
         if (s1 === peg$FAILED) {
-          s1 = peg$parseeuclid();
+          s1 = peg$parseletters();
           if (s1 === peg$FAILED) {
-            s1 = peg$parsepolymeter();
+            s1 = peg$parseeuclid();
             if (s1 === peg$FAILED) {
-              s1 = peg$parsegroup();
+              s1 = peg$parsepolymeter();
               if (s1 === peg$FAILED) {
-                s1 = peg$parseletter();
+                s1 = peg$parsegroup();
                 if (s1 === peg$FAILED) {
-                  s1 = peg$parserest();
+                  s1 = peg$parseletter();
                   if (s1 === peg$FAILED) {
-                    s1 = peg$parseonestep();
+                    s1 = peg$parserest();
+                    if (s1 === peg$FAILED) {
+                      s1 = peg$parseonestep();
+                    }
                   }
                 }
               }
@@ -2116,7 +2119,7 @@ const getIndex = ( pattern, phase ) => {
 // in addition to 'fast', phase resets are also necessary when indexing subpatterns,
 // which are currently arrays with no defined .type property, hence the inclusion of
 // undefined in the array below
-const shouldResetPhase = [ 'repeat', undefined, 'group' ] 
+const shouldResetPhase = [ undefined, 'group', 'layers' ] 
 
 // XXX does these need to look at all parents recursively? Right now we're only using one generation...
 const shouldReset = pattern => {
@@ -2311,10 +2314,16 @@ const handlers = {
     //pattern.left.parent = pattern.right.parent = pattern
     for( const group of pattern.values ) {
       const incr = getPhaseIncr( group )
-      console.log( 'group:', group.values )
-      state = state.concat(
-        processPattern( group, duration.clone(), phase.clone(), incr, incr, false )
+      const events = processPattern( group, duration.clone(), phase.clone(), incr, incr, false)
+      // not sure why excess events are generated, but they need to be filtered...
+      .filter( evt => 
+        evt.arc.start.valueOf() >= phase.valueOf() 
+        && evt.arc.start.valueOf() < phase.add( duration ).valueOf()
       )
+      
+      //console.log( 'group:', util.inspect( group, { depth:3 }) )
+      //console.log( 'state:', util.inspect( events, { depth:3 }))
+      state = state.concat( events )
     }
 
     return state
@@ -2342,8 +2351,8 @@ const handlers = {
       if( pattern.operator === '*' ) {
         events = queryArc( 
           pattern.value,
-          Fraction( 0 ), 
-          Fraction( speed )
+          phase.clone(), //Fraction( 0 ), 
+          Fraction( speed ).mul( duration )
         )
         // remap events to correct time spans
         .map( evt => {

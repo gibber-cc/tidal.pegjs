@@ -37,7 +37,7 @@ group "group" = _ '[' _ values:term+ _ ']' _ {
 // number, otherwise the number is parsed and you're left with a ? This ordering passes all tests
 // but might need to be tweaked.
 term "term" = body:(
-  repeat / degrade / feet / layer / number / letters / word / polymeter / group / euclid  / letter / rest / onestep 
+  repeat/ degrade / feet / layer / number / letters / word / polymeter / group /  euclid  / letter / rest / onestep 
 ) _ {return body}
 
 // bjorklund
@@ -65,11 +65,11 @@ notdegrade = body:( number / repeat / euclid / group / letter / onestep ) _ { re
 
 
 // match a binary operation, a la 4*2, or [0 1]*4
-repeat = value:notrepeat _ operator:op  _ rate:number _ {
+repeat = value:notrepeat _ operator:op  _ rate:notrepeat _ {
   return { type:'repeat', operator, rate, value }
 }
 // avoid left-recursions; must parse number before letters!
-notrepeat = body:(euclid / polymeter / number / letters /group / letter /  rest /onestep) _ { return body }
+notrepeat = body: (euclid / polymeter / number / letters /group / letter / rest /onestep ) _ { return body }
 
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
   const result = { 
@@ -135,7 +135,7 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']' _ {
         values:[ value ]
       }
     }else{
-      value.type = 'group'
+      /*value.type = 'group'*/
     }
   	values.push( value )
   }
@@ -143,7 +143,7 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']' _ {
   if( end.type === 'number' || end.type === 'string' ) {
     end = { type:'group', values:[ end ] }
   }else{
-    end.type = 'group'
+    /*end.type = 'group'*/
   }
 
   values.push( end )
@@ -155,7 +155,8 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']' _ {
 
   return result
 }
-notlayer = body:( list / number / letters / euclid / polymeter / group / letter / rest / onestep) _ { return body }
+//notlayer = body:( repeat / number ) _ { return body }
+notlayer = body:( repeat / list / number / letters / euclid / polymeter / group / letter / rest / onestep) _ { return body }
 
 
 // One-step

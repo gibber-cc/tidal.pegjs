@@ -101,18 +101,34 @@ describe( "Testing repeats with '*'", () => {
     assert.deepEqual( result, expected )
 
   })
-
-  it( 'should generate one event given "0/2" and a duration of 2' , () => {
+  
+  it( 'should generate four events given "0*2" and a duration of 2' , () => {
     const expected = [
-      { value:0, arc:{ start:Fraction(0), end:Fraction(2) } },
+      { value:0, arc:{ start:Fraction(0), end:Fraction(1,2) } },
+      { value:0, arc:{ start:Fraction(1,2), end:Fraction(1) } },
+      { value:0, arc:{ start:Fraction(1), end:Fraction(3,2) } },
+      { value:0, arc:{ start:Fraction(3,2), end:Fraction(2) } }
     ]
 
-    const pattern = parser.parse( '0/2' )
-    const result = queryArc( pattern, Fraction(0), Fraction(1) )
+    const pattern = parser.parse( '0*2' )
+    const result = queryArc( pattern, Fraction(0), Fraction(2) )
+
+    //console.log( '\n\nresult:', util.inspect( result, { depth:4 } ), '\n\n' )
 
     assert.deepEqual( result, expected )
 
   })
+  //it( 'should generate one event given "0/2" and a duration of 2' , () => {
+  //  const expected = [
+  //    { value:0, arc:{ start:Fraction(0), end:Fraction(2) } },
+  //  ]
+
+  //  const pattern = parser.parse( '0/2' )
+  //  const result = queryArc( pattern, Fraction(0), Fraction(1) )
+
+  //  assert.deepEqual( result, expected )
+
+  //})
   
 
  /* // FAILS
