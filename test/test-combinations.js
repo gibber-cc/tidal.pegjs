@@ -4,7 +4,7 @@ const queryArc = require( '../src/queryArc.js' ).queryArc
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 
-describe( 'One-off tests.', () => {
+describe( 'One-off tests for potentially problematic combinations.', () => {
 
   it( '"0 1 [2,3]" should parse correctly.', () => {
     const expected = {
@@ -136,5 +136,19 @@ describe( 'One-off tests.', () => {
       results, 
       expected
     )
+  })
+  
+  it('<0*2 1> should return two zero events and one 1 event over two cycles.', () => {
+    const expected = [
+      { value:0, arc:{ start:Fraction(0),   end:Fraction(1,2) } },
+      { value:0, arc:{ start:Fraction(1,2), end:Fraction(1)   } },
+      { value:1, arc:{ start:Fraction(1),   end:Fraction(2)   } },
+    ]
+
+    const pattern = parser.parse('<0*2 1>')
+
+    const result  = queryArc( pattern, Fraction(0), Fraction(2) )
+
+    assert.deepEqual( result, expected )
   })
 })

@@ -171,6 +171,7 @@ const getPhaseIncr = pattern => {
 
 const handlers = {
   // standard lists e.g. '0 1 2 3' or '[0 1 2]'
+  rest( state ) { return state },
   group( state, pattern, phase, duration, overrideIncr=null ) {
     const start     = phase.clone(),
           end       = start.add( duration ),
@@ -292,10 +293,17 @@ const handlers = {
       // of state.
       group.count = group.count === undefined ? 0 : group.count + 1
 
-      state.push({ 
-        arc:Arc( phase, phase.add( duration ) ), 
-        value:group.values[ group.count % group.values.length ].value 
-      })
+      const subpattern = group.values[ group.count % group.values.length ]
+
+      const events = processPattern( 
+        subpattern, 
+        duration, 
+        phase.clone(), 
+        getPhaseIncr( subpattern ),
+        null,null,false
+      )
+
+      state.push( ...events )
     })
 
     return state

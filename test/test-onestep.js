@@ -12,7 +12,7 @@ const util     = require( 'util' )
 
 describe('Testing one-step per cycle', () => {
 
-  it('<> should return a group marked as onestep', () => {
+  it('<0 1 2> should return a group marked as onestep', () => {
     const expected = {
       type:'onestep',
       values:[{
@@ -42,6 +42,7 @@ describe('Testing one-step per cycle', () => {
     assert.deepEqual( result, expected )
   })
 
+  // XXX is this a correct Tidal combination?
   it('multiple <> should return nested group marked as onestep', () => {
 
     const expected = {

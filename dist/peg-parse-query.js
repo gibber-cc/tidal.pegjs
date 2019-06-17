@@ -2119,7 +2119,7 @@ const getIndex = ( pattern, phase ) => {
 // in addition to 'fast', phase resets are also necessary when indexing subpatterns,
 // which are currently arrays with no defined .type property, hence the inclusion of
 // undefined in the array below
-const shouldResetPhase = [ undefined, 'group', 'layers' ] 
+const shouldResetPhase = [ 'repeat', undefined, 'group', 'layers' ] 
 
 // XXX does these need to look at all parents recursively? Right now we're only using one generation...
 const shouldReset = pattern => {
@@ -2147,6 +2147,7 @@ const getPhaseIncr = pattern => {
 
 const handlers = {
   // standard lists e.g. '0 1 2 3' or '[0 1 2]'
+  rest( state ) { return state },
   group( state, pattern, phase, duration, overrideIncr=null ) {
     const start     = phase.clone(),
           end       = start.add( duration ),
@@ -2354,17 +2355,21 @@ const handlers = {
           phase.clone(), //Fraction( 0 ), 
           Fraction( speed ).mul( duration )
         )
+        //events = processPattern(
+        //  pattern.value,
+        //  incr.mul( speed ),
+        //  phase.clone() )
+          
         // remap events to correct time spans
         .map( evt => {
-          evt.arc.start = evt.arc.start.div( speed )
-          evt.arc.end   = evt.arc.end.div( speed )
+          evt.arc.start = evt.arc.start.div( speed ).add( phase )
+          evt.arc.end   = evt.arc.end.div( speed ).add( phase )
           return evt
         })
-        // remove events don't fall  in the current window
-        .filter( evt => 
-          evt.arc.start.compare( incr.mul( i ) ) >= 0 
-            && evt.arc.start.compare( incr.mul( i+1 ) ) < 0 
-        )
+        //.filter( evt => 
+        //  evt.arc.start.compare( incr.mul( i ) ) >= 0 
+        //    && evt.arc.start.compare( incr.mul( i+1 ) ) < 0 
+        //))
         // add to previous events
         .concat( events )
       }else{
