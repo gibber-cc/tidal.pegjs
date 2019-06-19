@@ -3813,6 +3813,12 @@ const processPattern = ( pattern, duration, phase, phaseIncr=null, override = nu
 // placeholder for potentially adding more goodies (parent arc etc.) later
 const Arc = ( start, end ) => ({ start, end })
 
+const shouldNotRemap = ['polymeter', 'onestep']
+const shouldRemap = pattern => shouldNotRemap.indexOf( pattern.type ) === -1
+
+// XXX seems like getMappedArc should be changed to what onestep and group are now using?
+// would that change work with how getMappedArc is used in processPattern?
+
 // map arc time values to appropriate durations
 const getMappedArc = ( arc, phase, phaseIncr ) => {
   let mappedArc
@@ -3873,9 +3879,6 @@ const shouldReset = pattern => {
   return reset && parent
 }
 
-const shouldNotRemap = ['polymeter', 'onestep']
-const shouldRemap = pattern => shouldNotRemap.indexOf( pattern.type ) === -1
-
 // I assume this will need to be a switch on pattern.type in the future...
 const getPhaseIncr = pattern => {
   let incr
@@ -3925,7 +3928,19 @@ const handlers = {
         if( member !== undefined ) member.parent = pattern
         //const events = processPattern( member, dur, phase.clone(), getPhaseIncr( member ), null, shouldRemap( member ) )
         //console.log( 'processing ', pattern.type, member.type, dur.toFraction(),  phaseIncr.toFraction() )
-        const events = processPattern( member, dur, phase.clone(), getPhaseIncr(member), null, shouldRemap( member ) )
+        const events = processPattern( 
+          member, 
+          Fraction(1), 
+          Fraction(0), 
+          null, //getPhaseIncr(member), 
+          null, 
+          false//shouldRemap( member )
+        )
+        .map( evt => {
+          evt.arc.start = evt.arc.start.mul( dur ).add( phase )
+          evt.arc.end   = evt.arc.end.mul( dur ).add( phase )
+          return evt
+        })
 
         eventList = eventList.concat( events )
       }else{

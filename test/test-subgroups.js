@@ -11,6 +11,7 @@ const util   = require( 'util' )
 const Fraction = require( 'fraction.js' )
 
 describe( 'Testing group groups and nested group groups.', () => {
+  
   it( 'Array brackets [] should return an array marked as a group.', () => {
 
     const expected = {
@@ -107,6 +108,7 @@ describe( 'Testing group groups and nested group groups.', () => {
 
     assert.deepEqual( result, expected )
   })
+  
 
   it( `"0 [1 2]" should schedule three events at 0, 1/2, and 3/4`, () => {
     const expected = [
@@ -132,6 +134,39 @@ describe( 'Testing group groups and nested group groups.', () => {
     )
   })
 
+  
+  it( `"0 1 [2 3]" should schedule four events at 0, 1/3, 4/6, and 5/6.`, () => {
+    const expected = [
+      {
+        value:0,
+        arc: { start: Fraction(0), end:Fraction(1,3) }
+      },
+      {
+        value:1,
+        arc: { start: Fraction(1,3), end:Fraction(2,3) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(2,3), end:Fraction(5,6) }
+      },
+      {
+        value:3,
+        arc: { start: Fraction(5,6), end:Fraction(1) }
+      }
+    ]
+    
+    const pattern = parser.parse('0 1 [2 3]')
+    const results = queryArc( pattern, Fraction(0), Fraction(1) )
+
+    console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
+    
+    assert.deepEqual( 
+      results,
+      expected, 
+    )
+  })
+
+  
   it( `"0 [1 [2 3]]" should schedule four events at 0, 1/2, 3/4, and 7/8.`, () => {
     const expected = [
       {
@@ -228,4 +263,5 @@ describe( 'Testing group groups and nested group groups.', () => {
 
     assert.deepEqual( result, expected )
   })
+  
 })
