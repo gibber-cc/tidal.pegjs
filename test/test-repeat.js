@@ -87,7 +87,6 @@ describe( "Testing repeats with '*'", () => {
     const result = parser.parse( '[2 1]*2' )
 
     assert.deepEqual( result, expected )
-
   })
 
   it( 'should generate two events given "0*2" and a duration of 1' , () => {
@@ -98,9 +97,12 @@ describe( "Testing repeats with '*'", () => {
 
     const pattern = parser.parse( '0*2' )
     const result = queryArc( pattern, Fraction(0), Fraction(1) )
+
+
     assert.deepEqual( result, expected )
 
   })
+  
   
   it( 'should generate four events given "0*2" and a duration of 2' , () => {
     const expected = [
@@ -114,9 +116,7 @@ describe( "Testing repeats with '*'", () => {
     const result = queryArc( pattern, Fraction(0), Fraction(2) )
 
     //console.log( '\n\nresult:', util.inspect( result, { depth:4 } ), '\n\n' )
-
     assert.deepEqual( result, expected )
-
   })
   //it( 'should generate one event given "0/2" and a duration of 2' , () => {
   //  const expected = [

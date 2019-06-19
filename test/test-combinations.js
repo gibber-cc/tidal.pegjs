@@ -5,7 +5,6 @@ const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 
 describe( 'One-off tests for potentially problematic combinations.', () => {
-
   it( '"0 1 [2,3]" should parse correctly.', () => {
     const expected = {
       values: [
@@ -132,6 +131,7 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
     const pattern = parser.parse('0 1 [2,3]')
     const results = queryArc( pattern, Fraction(0), Fraction(1) )
 
+    //console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
     assert.deepEqual( 
       results, 
       expected
@@ -151,4 +151,73 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
 
     assert.deepEqual( result, expected )
   })
+  
+
+  it('[0 <1 2>] should return two zeros, a one and a two over two cycles.', () => {
+    const expected = [
+      { value:0, arc:{ start:Fraction(0),   end:Fraction(1,2) } },
+      { value:1, arc:{ start:Fraction(1,2), end:Fraction(1)   } },
+      { value:0, arc:{ start:Fraction(1),   end:Fraction(3,2) } },
+      { value:2, arc:{ start:Fraction(3,2), end:Fraction(2)   } },
+    ]
+
+    const pattern = parser.parse('[0 <1 2>]')
+
+    const result  = queryArc( pattern, Fraction(0), Fraction(2) )
+
+    //console.log( 'result:', util.inspect( result, { depth:4 } ), '\n\n' )
+
+    assert.deepEqual( result, expected )
+  })
+  it( `"0 [1 2]" should schedule three events at 0, 1/2, and 3/4`, () => {
+    const expected = [
+      {
+        value:0,
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      },
+      {
+        value:1,
+        arc: { start: Fraction(1,2), end:Fraction(3/4) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(3,4), end:Fraction(1) }
+      }
+    ]
+    
+    const pattern = parser.parse('0 [1 2]')
+    const results = queryArc( pattern, Fraction(0), Fraction(1) )
+    //console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
+
+    assert.deepEqual( 
+      results,      
+      expected 
+    )
+  }) 
+ 
+  it( `"0 <2*2 1>" should schedule three events at 0, 1/2, and 3/4`, () => {
+    const expected = [
+      {
+        value:0,
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(1,2), end:Fraction(3/4) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(3,4), end:Fraction(1) }
+      }
+    ]
+    
+    const pattern = parser.parse('0 <2*2 1>')
+    const results = queryArc( pattern, Fraction(0), Fraction(1) )
+    //console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
+
+    assert.deepEqual( 
+      results,      
+      expected 
+    )
+  }) 
 })
