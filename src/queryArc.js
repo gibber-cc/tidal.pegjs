@@ -360,7 +360,7 @@ const handlers = {
 
       if( pattern.uid !== undefined ) evt.uid = pattern.uid
 
-      state.push(uid)
+      state.push( evt )
     }
 
     return state 

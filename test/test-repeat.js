@@ -9,6 +9,18 @@ const parser = require('../dist/tidal.js')
 const queryArc = require( '../src/queryArc.js' ).queryArc
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
+const loc = ( c1, c2 ) => ({
+  start:{
+    offset:c1,
+    line:1,
+    column:c1 + 1
+  },
+  end:{
+    offset:c2,
+    line:1,
+    column:c2 + 1
+  }
+})
 
 describe( "Testing repeats with '*'", () => {
 
@@ -17,12 +29,14 @@ describe( "Testing repeats with '*'", () => {
     const expected = {
       type: 'repeat',
       operator:'*',
-      rate: { type: 'number', value: 2 },
-      value: { type:'number', value:0 }
+      rate: { type: 'number', value:'2' },
+      value: { type:'number', value:'0' },
+      location:loc(0,3)
     }
 
-    const result = parser.parse( '0*2' )
+    const result = parser.parse( '0*2', { addLocations:true } )
 
+    //console.log( 'result:', util.inspect( result, { depth:4 } ) )
     assert.deepEqual(result, expected)
   })
 

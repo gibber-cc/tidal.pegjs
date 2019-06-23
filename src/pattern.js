@@ -7,13 +7,13 @@ const Fraction = require( 'fraction.js' )
  * different start and end times for each query. A priority
  * queue is used to sort the events... 
 */
-const Pattern = patternString => {
+const Pattern = ( patternString, opts ) => {
   if( typeof patternString !== 'string' )
     throw 'You must provide a string to generate the pattern from'
 
   let __data
   try{
-    __data = parse( patternString )
+    __data = parse( patternString, opts )
   }catch( e ) {
     throw `We were unable to parse the pattern ${patternString}. ${e.toString()}`
   }
@@ -29,8 +29,12 @@ const Pattern = patternString => {
       if( typeof start !== 'object' ) start = Fraction( start )
       if( typeof duration !== 'object' ) duration = Fraction( duration )
 
-      ptrn.events = query( ptrn.__data, start, duration )
-        .sort( ptrn.__sort )
+      ptrn.events = query( 
+        ptrn.__data, 
+        start,
+        duration 
+      )
+      .sort( ptrn.__sort )
 
       return ptrn.events
     },

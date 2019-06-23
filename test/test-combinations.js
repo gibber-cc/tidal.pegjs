@@ -220,4 +220,78 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
       expected 
     )
   }) 
+  //[0,2]*3 [1,3]*2
+  it( `"[0,2]*2" should schedule four events`, () => {
+    const expected = [
+      {
+        value:0,
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      },
+      {
+        value:0,
+        arc: { start: Fraction(1,2), end:Fraction(1) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(1,2), end:Fraction(1) }
+      }
+    ]
+    
+    const pattern = parser.parse('[0,2]*2')
+    const results = queryArc( pattern, Fraction(0), Fraction(1) )
+
+    assert.deepEqual( 
+      results,      
+      expected 
+    )
+  }) 
+
+  it( `"[0,2]*2 [1,3]*2" should schedule eight events`, () => {
+    const expected = [
+      {
+        value:0,
+        arc: { start: Fraction(0), end:Fraction(1,4) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(0), end:Fraction(1,4) }
+      },
+      {
+        value:0,
+        arc: { start: Fraction(1,4), end:Fraction(1,2) }
+      },
+      {
+        value:2,
+        arc: { start: Fraction(1,4), end:Fraction(1,2) }
+      },
+      {
+        value:1,
+        arc: { start: Fraction(1,2), end:Fraction(3,4) }
+      },
+      {
+        value:3,
+        arc: { start: Fraction(1,2), end:Fraction(3,4) }
+      }, 
+      {
+        value:1,
+        arc: { start: Fraction(3,4), end:Fraction(1) }
+      },
+      {
+        value:3,
+        arc: { start: Fraction(3,4), end:Fraction(1) }
+      } 
+    ]
+    
+    const pattern = parser.parse('[0,2]*2 [1,3]*2')
+    const results = queryArc( pattern, Fraction(0), Fraction(1) )
+
+    assert.deepEqual( 
+      results,      
+      expected 
+    )
+  }) 
 })

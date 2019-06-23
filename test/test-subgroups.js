@@ -10,7 +10,7 @@ const queryArc = require( '../src/queryArc.js' ).queryArc
 const util   = require( 'util' )
 const Fraction = require( 'fraction.js' )
 
-describe( 'Testing group groups and nested group groups.', () => {
+describe( 'Testing subgroups and nested subgroups.', () => {
   
   it( 'Array brackets [] should return an array marked as a group.', () => {
 
@@ -158,7 +158,7 @@ describe( 'Testing group groups and nested group groups.', () => {
     const pattern = parser.parse('0 1 [2 3]')
     const results = queryArc( pattern, Fraction(0), Fraction(1) )
 
-    console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
+    //console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
     
     assert.deepEqual( 
       results,
@@ -196,7 +196,7 @@ describe( 'Testing group groups and nested group groups.', () => {
   })
 
   // two feet needs a different test from > 2 feet due to PEG vagaries...
-  it( "Marking flattened feet with '.' should divide groups into groups.", () => {
+  it( "'0 1 2 . 3 4' Marking flattened feet with '.' should divide groups into groups.", () => {
     const expected = {
       type:'group',
       values:[
@@ -223,7 +223,7 @@ describe( 'Testing group groups and nested group groups.', () => {
     assert.deepEqual( result, expected )
   })
 
-  it( "Testing four groups marked out by feet.", () => {
+  it( "'0 1 2 . 3 4 . 5 6 . 7' Testing four groups marked out by feet.", () => {
     const expected = {
       type:'group',
       values:[
@@ -249,17 +249,14 @@ describe( 'Testing group groups and nested group groups.', () => {
             { type: 'number', value: 6 }
           ]
         },
-        {
-          type:'group',
-          values:[
-            { type: 'number', value: 7 }
-          ]
-        }
+        { type: 'number', value: 7 }
 
       ]
     }
 
     const result = parser.parse( '0 1 2 . 3 4 . 5 6 . 7' )
+
+    console.log( '\n\nresult:', util.inspect( result, { depth:9 } ), '\n\n' )
 
     assert.deepEqual( result, expected )
   })

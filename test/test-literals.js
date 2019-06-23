@@ -10,8 +10,53 @@ const queryArc = require( '../src/queryArc.js' ).queryArc
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 
-describe( 'Testing parsing literals.', () => {
+const loc = ( c1, c2 ) => ({
+  start:{
+    offset:c1,
+    line:1,
+    column:c1 + 1
+  },
+  end:{
+    offset:c2,
+    line:1,
+    column:c2 + 1
+  }
+})
 
+describe( 'Testing parsing literals.', () => {
+  it ('"0" should parse to a number.', () => {
+    const expected = { type: 'number', value: 0, location:loc(0,1) }
+
+    const result = parser.parse( '0', { addLocations:true } )
+
+    assert.deepEqual( result, expected )
+  })
+ 
+  it ('"10" should parse to a number.', () => {
+    const expected = { type: 'number', value: 10 }
+
+    const result = parser.parse( '10' ) 
+
+    assert.deepEqual( result, expected )
+  })
+ 
+  it ('"0 1" should parse to two numbers.', () => {
+    const expected = {
+      type:'group',
+      values:[
+        { type: 'number', value: 0, location:loc(0,1) },
+        { type: 'number', value: 1, location:loc(2,3) }
+      ],
+      location:loc(0,3)
+    }
+
+    const result = parser.parse( '0 1', { addLocations:true } )
+
+    //console.log( '\n\nexpected:', util.inspect( expected, { depth:4 }), '\n\n' )
+    //console.log( 'result:', util.inspect( result, { depth:4 }) )
+    assert.deepEqual( result, expected )
+  })
+  
   it ('"a" should parse to a string.', () => {
     const expected = { type: 'string', value: 'a' }
 
@@ -139,4 +184,5 @@ describe( 'Testing parsing literals.', () => {
       expected
     )
   })
+  
 })
