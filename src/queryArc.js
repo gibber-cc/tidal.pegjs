@@ -225,11 +225,15 @@ const handlers = {
 
         eventList = eventList.concat( events )
       }else{
+        // XXX shouldn't we just process all patterns???
         // member does not need further processing, so add to event list
-        eventList.push({ 
+        const evt = { 
           value:member.value, 
           arc:Arc( phase, phase.add( dur ) ),
-        })
+        }
+        if( member.uid !== undefined ) evt.uid = member.uid 
+
+        eventList.push( evt )
       }
 
       // assuming we are starting / ending at a regular phase increment value...
@@ -334,21 +338,29 @@ const handlers = {
   },
 
   number( state, pattern, phase, duration ) {
-    state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
+    const evt = { arc:Arc( phase, phase.add( duration ) ), value:pattern.value }
+    if( pattern.uid !== undefined ) evt.uid = pattern.uid
+    state.push(evt)
     return state 
   },
 
   string( state, pattern, phase, duration ) {
-    state.push({ arc:Arc( phase, phase.add( duration ) ), value:pattern.value })
+    const evt = { arc:Arc( phase, phase.add( duration ) ), value:pattern.value }
+    if( pattern.uid !== undefined ) evt.uid = pattern.uid
+    state.push(evt)
     return state 
   },
 
   degrade( state, pattern, phase, duration ) {
     if( Math.random() > .5 ) {
-      state.push({ 
+      const evt = { 
         arc:Arc( phase, phase.add( duration ) ), 
-        value:pattern.value 
-      })
+        value:pattern.value
+      }
+
+      if( pattern.uid !== undefined ) evt.uid = pattern.uid
+
+      state.push(uid)
     }
 
     return state 
