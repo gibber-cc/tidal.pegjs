@@ -256,7 +256,7 @@ describe( 'Testing subgroups and nested subgroups.', () => {
 
     const result = parser.parse( '0 1 2 . 3 4 . 5 6 . 7' )
 
-    console.log( '\n\nresult:', util.inspect( result, { depth:9 } ), '\n\n' )
+    //console.log( '\n\nresult:', util.inspect( result, { depth:9 } ), '\n\n' )
 
     assert.deepEqual( result, expected )
   })

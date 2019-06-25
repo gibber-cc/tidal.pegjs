@@ -95,10 +95,6 @@ repeat = value:notrepeat _ operator:op  _ rate:notrepeat _ {
     }
   }
   
-  // not needed anymore
-  if( value.location !== undefined ) delete value.location
-  if( rate.location !== undefined )  delete rate.location
-
   return r 
 }
 // avoid left-recursions; must parse number before letters!

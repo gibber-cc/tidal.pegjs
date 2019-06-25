@@ -211,10 +211,6 @@ function peg$parse(input, options) {
           }
         }
         
-        // not needed anymore
-        if( value.location !== undefined ) delete value.location
-        if( rate.location !== undefined )  delete rate.location
-
         return r 
       },
       peg$c21 = "{",
@@ -253,7 +249,6 @@ function peg$parse(input, options) {
         return addLoc( out, location() )
       },
       peg$c30 = function(value) {
-        //value.type = 'group'
         return value
       },
       peg$c31 = function(body, end) {
@@ -2397,15 +2392,37 @@ const handlers = {
     // for the second third you'd get the second third of four a's..."
     
     const speed = pattern.rate.value
-    const events = queryArc(
-        pattern.value,
-        Fraction(0),
-        duration.mul( speed ) 
-      ).map( evt => {
-        evt.arc.start = evt.arc.start.div( speed ).add( phase )
-        evt.arc.end   = evt.arc.end.div( speed ).add( phase )
-        return evt
+    let   events = null
+
+    if( pattern.operator === '*' ) { 
+
+      events = queryArc(
+          pattern.value,
+          Fraction(0),
+          duration.mul( speed ) 
+        ).map( evt => {
+          evt.arc.start = evt.arc.start.div( speed ).add( phase )
+          evt.arc.end   = evt.arc.end.div( speed ).add( phase )
+          return evt
       })
+
+    }else{
+
+      events = queryArc(
+          pattern.value,
+          phase.div( speed ),
+          duration.div( speed )
+      )
+     .map( evt => {
+       //evt.arc.start = evt.arc.start.mul( speed ).add( phase )
+       evt.arc.end   = evt.arc.end.mul( speed ).add( phase )
+       return evt
+     })
+        
+     //.filter( evt => evt.arc.start.valueOf() < phase.add( duration ).valueOf() )
+      
+
+    }
     // XXX account for having a speeds pattern!!!!
     /*
     

@@ -3,8 +3,21 @@ const parser   = require('../dist/tidal.js')
 const queryArc = require( '../src/queryArc.js' ).queryArc
 const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
+const loc = ( c1, c2 ) => ({
+  start:{
+    offset:c1,
+    line:1,
+    column:c1 + 1
+  },
+  end:{
+    offset:c2,
+    line:1,
+    column:c2 + 1
+  }
+})
 
 describe( 'One-off tests for potentially problematic combinations.', () => {
+  
   it( '"0 1 [2,3]" should parse correctly.', () => {
     const expected = {
       values: [
@@ -220,7 +233,9 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
       expected 
     )
   }) 
-  //[0,2]*3 [1,3]*2
+  
+
+  
   it( `"[0,2]*2" should schedule four events`, () => {
     const expected = [
       {
@@ -294,4 +309,24 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
       expected 
     )
   }) 
+  
+  //it('<0*2 1> should create a location in the number 0', () => {
+  //  const expected = {
+  //    type: 'onestep',
+  //    values: [
+  //      {
+  //        type: 'repeat',
+  //        operator:'*',
+  //        value:{ type:'number', value:0, location:loc(1,2) },
+  //        rate: { type:'number', value:2 },
+  //        location:loc(1,3)
+  //      },
+  //      { type: 'number', value: 1 },
+  //    ],
+  //    location:loc(0,7)
+  //  }
+  //  const result = parser.parse( '<0*2 1>', { addLocations:true } )
+
+  //  assert.deepEqual( result, expected )
+  //})
 })

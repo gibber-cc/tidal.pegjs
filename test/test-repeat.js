@@ -22,15 +22,15 @@ const loc = ( c1, c2 ) => ({
   }
 })
 
-describe( "Testing repeats with '*'", () => {
+describe( "Testing repetitions.", () => {
 
   it( 'should generate a 2x repeat on a number.', () => {
 
     const expected = {
       type: 'repeat',
       operator:'*',
-      rate: { type: 'number', value:'2' },
-      value: { type:'number', value:'0' },
+      rate: { type: 'number', value:2, location:loc(2,3) },
+      value: { type:'number', value:0, location:loc(0,1) },
       location:loc(0,3)
     }
 
@@ -132,20 +132,20 @@ describe( "Testing repeats with '*'", () => {
     //console.log( '\n\nresult:', util.inspect( result, { depth:4 } ), '\n\n' )
     assert.deepEqual( result, expected )
   })
-  //it( 'should generate one event given "0/2" and a duration of 2' , () => {
-  //  const expected = [
-  //    { value:0, arc:{ start:Fraction(0), end:Fraction(2) } },
-  //  ]
 
-  //  const pattern = parser.parse( '0/2' )
-  //  const result = queryArc( pattern, Fraction(0), Fraction(1) )
+  it( 'should generate one event given "0/2" and a duration of 2' , () => {
+    const expected = [
+      { value:0, arc:{ start:Fraction(0), end:Fraction(2) } },
+    ]
 
-  //  assert.deepEqual( result, expected )
+    const pattern = parser.parse( '0/2' )
+    const result = queryArc( pattern, Fraction(0), Fraction(2) )
 
-  //})
+    assert.deepEqual( result, expected )
+
+  })
   
 
- /* // FAILS
   it( 'should generate two events given "[0 1]/2" and a duration of 2' , () => {
     const expected = [
       { value:0, arc:{ start:Fraction(0), end:Fraction(1) } },
@@ -155,9 +155,9 @@ describe( "Testing repeats with '*'", () => {
     const pattern = parser.parse( '[0 1]/2' )
     const result = queryArc( pattern, Fraction(0), Fraction(2) )
 
-    //console.log( 'result:', util.inspect( result, { depth:3 } ) )
+    //console.log( 'result:', util.inspect( result, { depth:4 } ) )
     assert.deepEqual( result, expected )
 
     })
-   */ 
+    
  })

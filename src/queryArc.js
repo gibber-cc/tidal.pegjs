@@ -412,15 +412,36 @@ const handlers = {
     // for the second third you'd get the second third of four a's..."
     
     const speed = pattern.rate.value
-    const events = queryArc(
-        pattern.value,
-        Fraction(0),
-        duration.mul( speed ) 
-      ).map( evt => {
-        evt.arc.start = evt.arc.start.div( speed ).add( phase )
-        evt.arc.end   = evt.arc.end.div( speed ).add( phase )
-        return evt
+    let   events = null
+
+    if( pattern.operator === '*' ) { 
+
+      events = queryArc(
+          pattern.value,
+          Fraction(0),
+          duration.mul( speed ) 
+        ).map( evt => {
+          evt.arc.start = evt.arc.start.div( speed ).add( phase )
+          evt.arc.end   = evt.arc.end.div( speed ).add( phase )
+          return evt
       })
+
+    }else{
+
+      events = queryArc(
+          pattern.value,
+          phase.div( speed ),
+          duration
+      )
+     .map( evt => {
+       evt.arc.start = evt.arc.start.mul( speed ).add( phase )
+       evt.arc.end   = evt.arc.end.mul( speed ).add( phase )
+       return evt
+     })
+     .filter( evt => evt.arc.start.valueOf() < phase.add( duration.div( speed ) ).valueOf() )
+      
+
+    }
     // XXX account for having a speeds pattern!!!!
     /*
     
