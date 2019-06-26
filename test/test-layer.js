@@ -20,18 +20,8 @@ describe( 'Testing layers.', () => {
     const expected = {
       type:'layers',
       values:[
-        {
-          type:'group',
-          values:[
-            { type:'number', value:0 },
-          ]
-        },
-        {
-          type:'group',
-          values:[
-            { type:'number', value:1 },
-          ]
-        },
+        { type:'number', value:0 },
+        { type:'number', value:1 },
       ]
     }
 
@@ -45,18 +35,8 @@ describe( 'Testing layers.', () => {
     const expected = {
       type:'layers',
       values:[
-        {
-          type:'group',
-          values:[
-            { type:'number', value:10 },
-          ]
-        },
-        {
-          type:'group',
-          values:[
-            { type:'number', value:11 },
-          ]
-        },
+        { type:'number', value:10 },
+        { type:'number', value:11 },
       ]
     }
 
@@ -70,18 +50,8 @@ describe( 'Testing layers.', () => {
     const expected = {
       type:'layers',
       values:[
-        {
-          type:'group',
-          values:[
-            { type:'string', value:'a' },
-          ]
-        },
-        {
-          type:'group',
-          values:[
-            { type:'string', value:'b' },
-          ]
-        },
+        { type:'string', value:'a' },
+        { type:'string', value:'b' },
       ]
     }
 
@@ -95,18 +65,8 @@ describe( 'Testing layers.', () => {
     const expected = {
       type:'layers',
       values:[
-        {
-          type:'group',
-          values:[
-            { type:'string', value:'kd' },
-          ]
-        },
-        {
-          type:'group',
-          values:[
-            { type:'string', value:'sd' },
-          ]
-        },
+        { type:'string', value:'kd' },
+        { type:'string', value:'sd' },
       ]
     }
 

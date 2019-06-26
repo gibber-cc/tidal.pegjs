@@ -15,8 +15,8 @@
   }
 }
 
-// XXX the ordering here is very important... list must be before euclid, repeat etc.
-pattern =  feet / list / repeat / layer / euclid /  group / onestep / polymeter / term 
+// XXX the ordering here is very important... list must be before euclid, speed / slow  etc.
+pattern =  feet / list / speed / slow / layer / euclid /  group / onestep / polymeter / term 
 
 // a list (which is a group)
 list = _ _valuesstart:term _ _valuesend:term+ _ {
@@ -56,7 +56,7 @@ group "group" = _ '[' _ values:term+ _ ']' _ {
 // number, otherwise the number is parsed and you're left with a ? This ordering passes all tests
 // but might need to be tweaked.
 term "term" = body:(
-  repeat / degrade / layer / number / letters / word / polymeter / group /  euclid  / letter / rest / onestep
+  speed / slow / degrade / layer / number / letters / word / polymeter / group /  euclid  / letter / rest / onestep
 ) _ {return body}
 
 // bjorklund
@@ -81,12 +81,12 @@ degrade = value:notdegrade '?' {
   return addLoc( out, location() )
 }
 // avoid left-recursions
-notdegrade = body:( number / repeat / euclid / group / letter / onestep ) _ { return body }
+notdegrade = body:( number / speed / slow / euclid / group / letter / onestep ) _ { return body }
 
 
 // match a binary operation, a la 4*2, or [0 1]*4
-repeat = value:notrepeat _ operator:op  _ rate:notrepeat _ {
-  const r =  { type:'repeat', operator, rate, value }
+speed = value:notspeed _ '*'  _ rate:notspeed _ {
+  const r =  { type:'speed', rate, value }
 
   if( options.addLocations === true ) {
     r.location = {
@@ -98,8 +98,22 @@ repeat = value:notrepeat _ operator:op  _ rate:notrepeat _ {
   return r 
 }
 // avoid left-recursions; must parse number before letters!
-notrepeat = body: (euclid / polymeter / number / layer / letters /group / letter / rest /onestep ) _ { return body }
+notspeed = body: (euclid / polymeter / number / layer / letters /group / letter / rest /onestep ) _ { return body }
 
+slow = value:notslow _ '/'  _ rate:notslow _ {
+  const r =  { type:'slow', rate, value }
+
+  if( options.addLocations === true ) {
+    r.location = {
+      start:value.location.start,
+      end: rate.location.end
+    }
+  }
+  
+  return r 
+}
+// avoid left-recursions; must parse number before letters!
+notslow = body: (euclid / polymeter / number / layer / letters /group / letter / rest /onestep ) _ { return body }
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
   const result = { 
     'left':{
@@ -140,31 +154,12 @@ foot = value:notfoot+ dot _ {
   return value
 }
 // avoid left-recursions
-notfoot = list / degrade / polymeter / rest / repeat / euclid / number / letter / letters / word / onestep
+notfoot = list / degrade / polymeter / rest / speed / slow / euclid / number / letter / letters / word / onestep
 
 // basically, get each list and push into an array while leaving out whitespace
 // and commas
 layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']' _ {
-  const values = []
-
-  for( let i = 0; i < body.length; i++ ) {
-    let value = body[ i ][ 0 ]
-    if( value.type === 'number' || value.type === 'string' ) {
-      value = {
-        type:'group',
-        values:[ value ]
-      }
-    }else{
-      /*value.type = 'group'*/
-    }
-  	values.push( value )
-  }
-
-  if( end.type === 'number' || end.type === 'string' ) {
-    end = { type:'group', values:[ end ] }
-  }else{
-    /*end.type = 'group'*/
-  }
+  const values = body.map( val => val[0] )
 
   values.push( end )
 
@@ -175,8 +170,8 @@ layer = _ '[' _ body:(notlayer _ ',' _ )+ end:notlayer _ ']' _ {
 
   return addLoc( result, location() )
 }
-//notlayer = body:( repeat / number ) _ { return body }
-notlayer = body:( repeat / list / number / letters / euclid / polymeter / group / letter / rest / onestep) _ { return body }
+
+notlayer = body:( speed / slow / list / number / letters / euclid / polymeter / group / letter / rest / onestep) _ { return body }
 
 // One-step
 onestep = '<' _ body:notonestep ','? end:notonestep? _ '>' {
@@ -192,7 +187,7 @@ onestep = '<' _ body:notonestep ','? end:notonestep? _ '>' {
   return addLoc( onestep, location() )
 }
 
-notonestep = body:(list / euclid / polymeter / word / group / number / letter /  rest / layer) _ { return body }
+notonestep = body:(list / euclid / polymeter / word / group / number / letter / rest / layer) _ { return body }
 
 word "word" = _ value:$[letter number]+ _ { 
   return addLoc( { type:typeof value, value, }, location() )
@@ -207,7 +202,6 @@ letter =  value:$[^ \[\] \{\} \(\) \t\n\r '*' '/' '.' '~' '?' ',' '>' '<' ]  {
 }
 
 // match tidal operators
-op = ('*' / '/')
 dot = '.'
 question = '?'
 

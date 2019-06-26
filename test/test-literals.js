@@ -174,7 +174,7 @@ describe( 'Testing parsing literals.', () => {
     )
   })
 
-  it( `"0" should schedule no events at phase 0 duration .25`, () => {
+  it( `"0" should schedule no events at phase .5 duration .25`, () => {
     const expected = []
 
     const pattern = parser.parse('0')

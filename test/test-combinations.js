@@ -25,12 +25,7 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
         { type: 'number', value: 1 },
         { 
           type: 'layers',
-          values:[
-            { type:'group',
-              values:[{ type: 'number', value: 2 }] },
-            { type:'group',
-              values:[{ type: 'number', value: 3 }] }
-          ]
+          values:[{type: 'number', value: 2 },{ type: 'number', value: 3 }] 
         }
       ],
       type: 'group'
@@ -43,10 +38,8 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
   it( '"[2,3]" should parse correctly for two cycles.', () => {
     const expected = {
       values: [
-        { type:'group',
-          values:[{ type: 'number', value: 2 }] },
-        { type:'group',
-          values:[{ type: 'number', value: 3 }] },
+        { type: 'number', value: 2 },
+        { type: 'number', value: 3 },
       ],
       type: 'layers'
     }
@@ -59,11 +52,9 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
     const expected = {
       type: 'layers',
       values: [
-        { type:'group',
-          values:[{ type: 'number', value: 2 }] },
+        { type: 'number', value: 2 },
         {
-          type: 'repeat',
-          operator:'*',
+          type: 'speed',
           value:{ type:'number', value:3 },
           rate: { type:'number', value:2 }
         }
@@ -78,13 +69,11 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
       type: 'layers',
       values: [
         {
-          type: 'repeat',
-          operator:'*',
+          type: 'speed',
           value:{ type:'number', value:3 },
           rate: { type:'number', value:2 }
         },
-        { type:'group',
-          values:[{ type: 'number', value: 2 }] },
+        { type: 'number', value: 2 },
       ],
     }
     const result = parser.parse( '[3*2,2]' )
@@ -309,24 +298,26 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
       expected 
     )
   }) 
-  
-  //it('<0*2 1> should create a location in the number 0', () => {
-  //  const expected = {
-  //    type: 'onestep',
-  //    values: [
-  //      {
-  //        type: 'repeat',
-  //        operator:'*',
-  //        value:{ type:'number', value:0, location:loc(1,2) },
-  //        rate: { type:'number', value:2 },
-  //        location:loc(1,3)
-  //      },
-  //      { type: 'number', value: 1 },
-  //    ],
-  //    location:loc(0,7)
-  //  }
-  //  const result = parser.parse( '<0*2 1>', { addLocations:true } )
 
-  //  assert.deepEqual( result, expected )
-  //})
+  it( `"[0,4]/2" should query correctly over two cycles`, () => {
+    const expected = [
+      {
+        value:0,
+        arc: { start: Fraction(0), end:Fraction(2) }
+      },
+      {
+        value:4,
+        arc: { start: Fraction(0), end:Fraction(2) }
+      }
+    ]
+    
+    const pattern = parser.parse('[0,4]/2')
+    const results = queryArc( pattern, Fraction(0), Fraction(2) )
+
+    console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
+    assert.deepEqual( 
+      results, 
+      expected
+    )
+  })
 })
