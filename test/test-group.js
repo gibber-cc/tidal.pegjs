@@ -62,6 +62,21 @@ describe( 'Testing simple number series groups.', () => {
     )
   })
 
+  it( `when starting with a phase of .5, "0 1" should schedule one event, at 0`, () => {
+    const expected = [
+      {
+        value:1,
+        arc: { start: Fraction(0), end:Fraction(1,2) }
+      }
+    ]
+    
+    const pattern = parser.parse('0 1')
+
+    assert.deepEqual( 
+      expected, 
+      queryArc( pattern, Fraction(.5), Fraction(.5) ) 
+    )
+  })
   it( `when starting with a phase of .85 and a duration of .1, "0 1" should schedule no events`, () => {
     const expected = []
     const pattern = parser.parse('0 1')

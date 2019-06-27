@@ -26,6 +26,7 @@ describe('Testing one-step per cycle', () => {
     }
     const result = parser.parse('<0 1 2>')
 
+    
     assert.deepEqual( result, expected )
   })
 
@@ -67,7 +68,8 @@ describe('Testing one-step per cycle', () => {
       ]
     }
 
-    assert.deepEqual( parser.parse('<0 1 2, 3 4 5>'), expected )
+    const result = parser.parse('<0 1 2, 3 4 5>')
+    assert.deepEqual( result, expected )
 
   })
 

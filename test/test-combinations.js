@@ -18,6 +18,7 @@ const loc = ( c1, c2 ) => ({
 
 describe( 'One-off tests for potentially problematic combinations.', () => {
   
+   
   it( '"0 1 [2,3]" should parse correctly.', () => {
     const expected = {
       values: [
@@ -299,25 +300,70 @@ describe( 'One-off tests for potentially problematic combinations.', () => {
     )
   }) 
 
+
   it( `"[0,4]/2" should query correctly over two cycles`, () => {
     const expected = [
       {
         value:0,
-        arc: { start: Fraction(0), end:Fraction(2) }
+        arc: { start: Fraction(0), end:Fraction(1) }
       },
       {
         value:4,
-        arc: { start: Fraction(0), end:Fraction(2) }
+        arc: { start: Fraction(0), end:Fraction(1) }
       }
     ]
     
     const pattern = parser.parse('[0,4]/2')
     const results = queryArc( pattern, Fraction(0), Fraction(2) )
 
-    console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
+    //console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
     assert.deepEqual( 
       results, 
       expected
     )
   })
+
+  it( `"[0,4]/2" should query correctly over four cycles`, () => {
+    const expected = [
+      {
+        value:0,
+        arc: { start: Fraction(0), end:Fraction(1) }
+      },
+      {
+        value:4,
+        arc: { start: Fraction(0), end:Fraction(1) }
+      },
+      {
+        value:0,
+        arc: { start: Fraction(2), end:Fraction(3) }
+      },
+      {
+        value:4,
+        arc: { start: Fraction(2), end:Fraction(3) }
+      }
+
+    ]
+    
+    const pattern = parser.parse('[0,4]/2')
+    const results = queryArc( pattern, Fraction(0), Fraction(4) )
+
+    //console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
+    assert.deepEqual( 
+      results, 
+      expected
+    )
+  })
+
+  // */
+
+  //it(' weird test.', ()=> {
+  //  const pattern = parser.parse('[0,4]/2')
+  //  let results = []
+  //  for( let i = 0; i < 4; i++ ) {
+  //    results = results.concat( queryArc( pattern, Fraction(i), Fraction(1) ) )
+  //  }
+
+  //  console.log( '\n\nresult:', util.inspect( results, { depth:4 } ), '\n\n' )
+  //  assert.equal( results.length, 4 )    
+  //})
 })

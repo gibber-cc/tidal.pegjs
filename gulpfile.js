@@ -10,7 +10,7 @@ const plugins = require('gulp-load-plugins')();
 function generatePeg() {
   return gulp.src('src/tidal.pegjs')
     .pipe(gulp.dest('dist')) // Add the tidal.pegjs file to dist to do everything in the same directory
-    .pipe(plugins.pegjs({format: 'commonjs'}))
+    .pipe(plugins.pegjs({format: 'commonjs', cache:true }))
     .pipe(gulp.dest('dist'));
 }
 

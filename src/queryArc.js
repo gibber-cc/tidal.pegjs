@@ -49,8 +49,8 @@ const queryArc = function( pattern, phase, duration ) {
 
   // prune any events that fall before our start phase or after our end phase
   eventList = eventList.filter( evt => {
-    return evt.arc.start.valueOf() >= start.valueOf() 
-        && evt.arc.start.valueOf() <  end.valueOf()
+    return (evt.arc.start.valueOf() >= start.valueOf() 
+        && evt.arc.start.valueOf()  <  end.valueOf() ) 
   })
   // remap events to make their arcs relative to initial phase argument
   .map( evt => {
@@ -380,7 +380,6 @@ const handlers = {
   },
 
   layers( state, pattern, phase, duration ) {
-    console.log( 'layer phase:', phase.toFraction(), log( pattern.values, { depth:4 }) )
     //pattern.left.parent = pattern.right.parent = pattern
     for( const group of pattern.values ) {
       const incr = getPhaseIncr( group )
@@ -402,24 +401,48 @@ const handlers = {
   slow( state, pattern, phase, duration ) {
     const speed = pattern.rate.value
 
-    const events = queryArc(
-      pattern.value,
-      phase.div( speed ),
-      duration.div( speed )
-    )
-    //const events = processPattern(
-    //  pattern.value,
-    //  duration,//.div( speed ),
-    //  phase, //phase.div( speed )
-    //)
-    .map( evt => {
-      evt.arc.start = evt.arc.start.mul( speed ).add( phase )
-      evt.arc.end   = evt.arc.end.mul( speed ).add( phase )
-      return evt
-    })
-    //.filter( evt => evt.arc.start.valueOf() < phase.add( duration.div( speed ) ).valueOf() )
+    let events
+    if( phase.valueOf() % speed === 0 ) {
+      // XXX why do we need this edge case?
+      const phaseDiff = phase.sub( phase.div( speed ) )
 
-    return state.concat( events )
+      if( pattern.value.type !== 'layers' ) {
+        //events = queryArc(
+        //  pattern.value,
+        //  phase.div( speed ),
+        //  duration.div( speed )
+        //)
+        events = processPattern(
+          pattern.value,
+          duration,//.div( speed ),
+          phase.div( speed )
+        )       
+      }else{
+        events = handlers.layers( state, pattern.value, phase.div( speed ), duration.div( speed ) )
+      }
+
+      //console.log( log( events, { depth:3 }), phase.add( duration ).toFraction() )
+      //if( pattern.value.type === 'group' ) {
+      //  events = events.map( evt => {
+      //    evt.arc.start = evt.arc.start.mul( speed )
+      //    evt.arc.end   = evt.arc.end.mul( speed )
+      //    return evt
+      //  })
+      //}
+      events = events.map( evt => {
+        evt.arc.start = evt.arc.start.add( phaseDiff )
+        evt.arc.end   = evt.arc.end.add( phaseDiff )
+        //evt.arc.start = evt.arc.start.add( phase )
+        //evt.arc.end   = evt.arc.end.add( phase )
+        return evt
+      })
+      //.filter( evt => evt.arc.start.valueOf() < phase.add( duration ).valueOf() )
+    }
+    //console.log( 'slow:', log( events, { depth:3 }), phase.add( duration ).toFraction() )
+
+    if( events !== undefined ) state = state.concat( events )
+
+    return state
   },
 
 //const processPattern = ( pattern, duration, phase, phaseIncr=null, override = null, shouldRemapArcs=true ) => {

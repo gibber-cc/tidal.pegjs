@@ -16,7 +16,7 @@
 }
 
 // XXX the ordering here is very important... list must be before euclid, speed / slow  etc.
-pattern =  feet / list / speed / slow / layer / euclid /  group / onestep / polymeter / term 
+pattern =  feet / list / term 
 
 // a list (which is a group)
 list = _ _valuesstart:term _ _valuesend:term+ _ {
@@ -56,7 +56,7 @@ group "group" = _ '[' _ values:term+ _ ']' _ {
 // number, otherwise the number is parsed and you're left with a ? This ordering passes all tests
 // but might need to be tweaked.
 term "term" = body:(
-  speed / slow / degrade / layer / number / letters / word / polymeter / group /  euclid  / letter / rest / onestep
+  euclid / speed / slow / degrade / layer / number / letters / polymeter / group / letter / rest / onestep
 ) _ {return body}
 
 // bjorklund
@@ -81,7 +81,7 @@ degrade = value:notdegrade '?' {
   return addLoc( out, location() )
 }
 // avoid left-recursions
-notdegrade = body:( number / speed / slow / euclid / group / letter / onestep ) _ { return body }
+notdegrade = number / speed / slow / euclid / group / letter / onestep
 
 
 // match a binary operation, a la 4*2, or [0 1]*4
@@ -100,7 +100,7 @@ speed = value:notspeed _ '*'  _ rate:notspeed _ {
 // avoid left-recursions; must parse number before letters!
 notspeed = body: (euclid / polymeter / number / layer / letters /group / letter / rest /onestep ) _ { return body }
 
-slow = value:notslow _ '/'  _ rate:notslow _ {
+slow = value:notslow _ '/' _ rate:notslow _ {
   const r =  { type:'slow', rate, value }
 
   if( options.addLocations === true ) {
@@ -114,6 +114,7 @@ slow = value:notslow _ '/'  _ rate:notslow _ {
 }
 // avoid left-recursions; must parse number before letters!
 notslow = body: (euclid / polymeter / number / layer / letters /group / letter / rest /onestep ) _ { return body }
+
 polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
   const result = { 
     'left':{
