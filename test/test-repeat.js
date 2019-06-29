@@ -24,7 +24,7 @@ const loc = ( c1, c2 ) => ({
 
 describe( "Testing repetitions.", () => {
   
-  /*
+  
   it( 'should generate a 2x repeat on a number.', () => {
 
     const expected = {
@@ -201,7 +201,7 @@ describe( "Testing repetitions.", () => {
 
   })
 
-  /*
+  
   it( 'should generate three events given "0/2 1" and a duration of 2' , () => {
     const expected = [
       { value:0, arc:{ start:Fraction(0), end:Fraction(1,2) } },

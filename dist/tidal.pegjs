@@ -16,7 +16,14 @@
 }
 
 // XXX the ordering here is very important... list must be before euclid, speed / slow  etc.
-pattern =  feet / list / term 
+pattern =  value:(feet / list / term) {
+  let out = value
+  if( options.enclose === true && value.type !== 'group' ) {
+    out = { type:'group', values:[ value ] }
+  }
+  
+  return out
+}
 
 // a list (which is a group)
 list = _ _valuesstart:term _ _valuesend:term+ _ {
