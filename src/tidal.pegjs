@@ -79,7 +79,7 @@ euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term _ ')'? ','? _ rota
   return result
 }
 // avoid left-recursions
-noteuclid = body:( group / number / letter /  word / rest / onestep) _ { return body }
+noteuclid = body:( group / number / word / letters / letter / rest / onestep) _ { return body }
 
 
 // degrading individual values

@@ -898,13 +898,16 @@ function peg$parse(input, options) {
     if (s1 === peg$FAILED) {
       s1 = peg$parsenumber();
       if (s1 === peg$FAILED) {
-        s1 = peg$parseletter();
+        s1 = peg$parseword();
         if (s1 === peg$FAILED) {
-          s1 = peg$parseword();
+          s1 = peg$parseletters();
           if (s1 === peg$FAILED) {
-            s1 = peg$parserest();
+            s1 = peg$parseletter();
             if (s1 === peg$FAILED) {
-              s1 = peg$parseonestep();
+              s1 = peg$parserest();
+              if (s1 === peg$FAILED) {
+                s1 = peg$parseonestep();
+              }
             }
           }
         }
