@@ -1,7 +1,7 @@
 tidal.pegjs
 ===
 
-`tidal.pegjs` is a parsing expression grammar for the [TidalCycles pattern language](https://tidalcycles.org/patterns.html), written using [PEG.js](http://pegjs.org). The goal of the PEG is to easily translate strings of Tidal patterns into annotated JavaScript data structures for use in sequencing. The project also provides a `Pattern` object that can be queried for events by passing in a starting time and a duration.
+`tidal.pegjs` is a parsing expression grammar for the [TidalCycles pattern language](https://tidalcycles.org/patterns.html), written using [PEG.js](http://pegjs.org). The goal of the PEG is to easily translate strings of Tidal patterns into annotated JavaScript data structures for use in sequencing. The project also provides a `Pattern` object that can be queried for events by passing start and ending times.
 
 # Usage
 
