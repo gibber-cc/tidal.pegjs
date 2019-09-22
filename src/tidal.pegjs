@@ -76,7 +76,9 @@ euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term _ ')'? ','? _ rota
     'rotation': rotation.length > 0 ? rotation[ 0 ] : null
   }
 
-  return result
+  const withLoc = addLoc( result, location() ) 
+  withLoc.value.uid = withLoc.uid
+  return withLoc
 }
 // avoid left-recursions
 noteuclid = body:( group / number / word / letters / letter / rest / onestep) _ { return body }
