@@ -1,0 +1,29 @@
+<!docype html>
+<html lang='en'>
+  <head>
+    <script src='../../dist/pattern.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script>
+    <script src='./web-audio-scheduler.min.js'></script>
+    <style>
+    </style>
+  </head>
+  <body>
+    <div id='gui'>
+      <input id='pattern' type='text' value='8 [2 3] [1 <5 6 7>] 9'></input>
+      <!-- number of cycles:
+      <select id='numCycles'>
+        <option value='1'>1</option>
+        <option value='2'>2</option>
+        <option value='3'>3</option>
+        <option value='4'>4</option>
+        <option value='5' selected>5</option>
+      </select> -->
+      <button type="button" id="start-button">Start</button>
+      <button type="button" id="stop-button">Stop</button>
+      <button type="button" id="clearTrace">Trace</button>
+      <button type="button" id="randomColors">Colors</button>
+    </div>
+  </body>
+  <script src='./p5.js'></script>
+
+</html>
