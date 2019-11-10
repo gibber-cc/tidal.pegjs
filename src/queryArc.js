@@ -2,6 +2,12 @@ const Fraction = require( 'fraction.js' )
 const util     = require( 'util' )
 const bjork    = require( 'bjork' ) 
 const log      = util.inspect
+const srand    = require( 'seedrandom' )
+
+const rnd = function( phase ) {
+  //console.log( 'phase', phase.toFraction() )
+  return new srand( phase.toFraction() )()
+}
 
 /* queryArc
  *
@@ -67,8 +73,10 @@ const queryArc = function( pattern, phase, duration ) {
 // is called to query the pattern and map any generated events to the appropriate timespan
 const processPattern = ( pattern, duration, phase, phaseIncr=null, override = null, shouldRemapArcs=false ) => {
   //if( phaseIncr !== null ) debugger
+  const state = []
+  state.phase = phase
   let events = handlers[ pattern.type ]( 
-    [], 
+    state, 
     pattern, 
     /*shouldReset( pattern ) === true ? Fraction(0) :*/ phase.clone(), 
     // XXX this is confusing. we are getting around a problem
@@ -168,7 +176,17 @@ const getPhaseIncr = pattern => {
     case 'polymeter': incr = Fraction( 1, pattern.left.values.length ); break;
     case 'number': case 'string': incr = Fraction( 1 ); break;
     case 'onestep': incr = null; break;
-    default: incr = pattern.values !== undefined ? Fraction( 1, pattern.values.length ) : Fraction(1); break;
+    default:
+      if( pattern.values === undefined ){
+        incr = Fraction(1)
+      } else {
+        incr = Fraction( 1, pattern.values.length )
+        //let len = 0
+        //pattern.values.forEach( v => len += v.type === 'slow' ? v.rate.value : 1 )
+        //incr = Fraction( 1, len ) 
+      }
+      break;
+
   }
 
   return incr
@@ -211,8 +229,9 @@ const handlers = {
         const events = processPattern( 
           member, 
           Fraction(1), 
-          member.type !== 'slow' ? Fraction(0) : phase.clone(), 
-          null, //getPhaseIncr(member), 
+          //member.type !== 'slow' ? Fraction(0) : phase.clone(), 
+          Fraction(0),
+          null, //getPhaseIncr(member),
           null, 
           false//shouldRemap( member )
         )
@@ -236,6 +255,7 @@ const handlers = {
       }
 
       // assuming we are starting / ending at a regular phase increment value...
+      
       if( phase.mod( phaseIncr ).valueOf() === 0 ) {
         phase = advancePhase( phase, phaseIncr, end )
       }else{
@@ -301,7 +321,10 @@ const handlers = {
       return shouldInclude === 1
     })
 
-    events.forEach( evt => state.push( evt ) )
+    events.forEach( evt => {
+      evt.uid = pattern.value.uid
+      state.push( evt ) 
+    })
     
     return state
   },
@@ -353,11 +376,16 @@ const handlers = {
   },
 
   degrade( state, pattern, phase, duration ) {
-    if( Math.random() > .5 ) {
+    // attempt to seed random... rnd( state.phase )
+    const rnum = Math.random()
+    //console.log( 'rnd:', rnum, state.phase.toFraction() )
+    if( rnum > .5 ) {
       const evt = { 
         arc:Arc( phase, phase.add( duration ) ), 
-        value:pattern.value
+        value:pattern.value.value
       }
+
+      //console.log( 'adding', evt )
 
       if( pattern.uid !== undefined ) evt.uid = pattern.uid
 
@@ -402,7 +430,7 @@ const handlers = {
     const speed = pattern.rate.value
 
     let events
-    if( phase.valueOf() % speed === 0 ) {
+    //if( phase.valueOf() % speed === 0 ) {
       // XXX why do we need this edge case?
       const phaseDiff = phase.sub( phase.div( speed ) )
 
@@ -412,11 +440,23 @@ const handlers = {
         //  phase.div( speed ),
         //  duration.div( speed )
         //)
-        events = processPattern(
+        //console.log( duration, phase, speed )
+        //events = processPattern(
+        //  pattern.value,
+        //  duration.mul( speed ),
+        //  phase.div( speed )
+        //)       
+        events = queryArc(
           pattern.value,
-          duration,//.div( speed ),
-          phase.div( speed )
-        )       
+          Fraction(0),
+          duration.div( speed ) 
+        ).map( evt => {
+          const diff = evt.arc.end.sub( evt.arc.start )
+          evt.arc.start = evt.arc.start.add( phase )
+          evt.arc.end   = evt.arc.start.add( duration.mul( speed ) ).add( phase )
+          //console.log( diff, duration.mul( speed ), evt.arc.start, evt.arc.end )
+          return evt
+        })
       }else{
         events = handlers.layers( state, pattern.value, phase.div( speed ), duration.div( speed ) )
       }
@@ -429,15 +469,15 @@ const handlers = {
       //    return evt
       //  })
       //}
-      events = events.map( evt => {
-        evt.arc.start = evt.arc.start.add( phaseDiff )
-        evt.arc.end   = evt.arc.end.add( phaseDiff )
-        //evt.arc.start = evt.arc.start.add( phase )
-        //evt.arc.end   = evt.arc.end.add( phase )
-        return evt
-      })
+      //events = events.map( evt => {
+      //  evt.arc.start = evt.arc.start.add( phaseDiff )
+      //  evt.arc.end   = evt.arc.end.add( phaseDiff )
+      //  //evt.arc.start = evt.arc.start.add( phase )
+      //  //evt.arc.end   = evt.arc.end.add( phase )
+      //  return evt
+      //})
       //.filter( evt => evt.arc.start.valueOf() < phase.add( duration ).valueOf() )
-    }
+    //}
     //console.log( 'slow:', log( events, { depth:3 }), phase.add( duration ).toFraction() )
 
     if( events !== undefined ) state = state.concat( events )

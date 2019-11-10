@@ -75,8 +75,10 @@ euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term _ ')'? ','? _ rota
     value,
     'rotation': rotation.length > 0 ? rotation[ 0 ] : null
   }
-
-  return result
+ 
+  const withLoc = addLoc( result, location() ) 
+  //withLoc.value.uid = withLoc.uid
+  return withLoc
 }
 // avoid left-recursions
 noteuclid = body:( group / number / word / letters / letter / rest / onestep) _ { return body }
@@ -108,16 +110,30 @@ speed = value:notspeed _ '*'  _ rate:notspeed _ {
 notspeed = body: (euclid / polymeter / number / layer / letters /group / letter / rest /onestep ) _ { return body }
 
 slow = value:notslow _ '/' _ rate:notslow _ {
-  const r =  { type:'slow', rate, value }
+  /*const r =  { type:'slow', rate, value }*/
 
-  if( options.addLocations === true ) {
-    r.location = {
-      start:value.location.start,
-      end: rate.location.end
-    }
+  //if( options.addLocations === true ) {
+  //  r.location = {
+  //    start:value.location.start,
+  //    end: rate.location.end
+  //  }
+  //}
+  //const group = value.type === 'group'
+  //  ? value
+  const group = { type:'group', values:[ value ] }
+
+  const onestep = {
+    type:'onestep',
+    values:[ group ]
   }
-  
-  return r 
+
+  for( let i = 0; i < rate.value - 1; i++ ) {
+    group.values.push({ type:'rest' })
+  }
+
+  addLoc( onestep, location() )
+  return onestep
+  /*return r */
 }
 // avoid left-recursions; must parse number before letters!
 notslow = body: (euclid / polymeter / number / layer / letters /group / letter / rest /onestep ) _ { return body }
@@ -135,6 +151,8 @@ polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
     type: 'polymeter' 
   }
 
+  addLoc( result.left, location() )
+  addLoc( result.right, location() )
   addLoc( result, location() )
 
   return result

@@ -131,7 +131,7 @@ describe( "Testing repetitions.", () => {
 
   it( 'should generate one event given "0/2" and a duration of 2' , () => {
     const expected = [
-      { value:0, arc:{ start:Fraction(0), end:Fraction(1) } },
+      { value:0, arc:{ start:Fraction(0), end:Fraction(2) } },
     ]
 
     const pattern = parser.parse( '0/2' )
@@ -140,10 +140,12 @@ describe( "Testing repetitions.", () => {
     assert.deepEqual( result, expected )
 
   })
+
+  
   it( 'should generate two events given "0/2" and a duration of 3' , () => {
     const expected = [
-      { value:0, arc:{ start:Fraction(0), end:Fraction(1) } },
-      { value:0, arc:{ start:Fraction(2), end:Fraction(3) } },
+      { value:0, arc:{ start:Fraction(0), end:Fraction(2) } },
+      { value:0, arc:{ start:Fraction(2), end:Fraction(4) } },
     ]
 
     const pattern = parser.parse( '0/2' )
@@ -158,8 +160,8 @@ describe( "Testing repetitions.", () => {
   
   it( 'should generate two events given "0/4" and a duration of 8' , () => {
     const expected = [
-      { value:0, arc:{ start:Fraction(0), end:Fraction(1) } },
-      { value:0, arc:{ start:Fraction(4), end:Fraction(5) } },
+      { value:0, arc:{ start:Fraction(0), end:Fraction(4) } },
+      { value:0, arc:{ start:Fraction(4), end:Fraction(8) } },
     ]
 
     const pattern = parser.parse( '0/4' )
@@ -170,7 +172,7 @@ describe( "Testing repetitions.", () => {
 
   })
 
-  
+ /* 
   
   it( 'should generate two events given "[0 1]/2" and a duration of 2' , () => {
     const expected = [
@@ -185,8 +187,8 @@ describe( "Testing repetitions.", () => {
     assert.deepEqual( result, expected )
 
   })
-
-  // */ 
+/*
+  //  
   it( 'should generate two events given "[0 1]/2", a duration of 2, and a phase of 1' , () => {
     const expected = [
       { value:1, arc:{ start:Fraction(0), end:Fraction(1,2) } },
@@ -219,5 +221,5 @@ describe( "Testing repetitions.", () => {
     assert.deepEqual( result, expected )
 
   })
-  // */
+   */
 })

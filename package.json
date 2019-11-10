@@ -1,6 +1,6 @@
 {
   "name": "tidal.pegjs",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A parsing expression grammar for the Tidal pattern language, and associated pattern querying functions.",
   "main": "src/pattern.js",
   "directories": {
@@ -19,6 +19,10 @@
   ],
   "authors": "Charlie Roberts & Mariana Pachon-Puentes",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gibber-cc/tidal.pegjs"
+  },
   "devDependencies": {
     "bjork": "0.0.1",
     "browserify": "^16.2.3",
@@ -30,6 +34,7 @@
     "gulp-pegjs": "^0.1.0",
     "gulp-watch": "^5.0.1",
     "pegjs": "^0.10.0",
+    "seedrandom": "^3.0.3",
     "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
