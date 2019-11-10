@@ -75,9 +75,9 @@ euclid = _ value:noteuclid '(' _ pulses:term ',' _ slots:term _ ')'? ','? _ rota
     value,
     'rotation': rotation.length > 0 ? rotation[ 0 ] : null
   }
-
+ 
   const withLoc = addLoc( result, location() ) 
-  withLoc.value.uid = withLoc.uid
+  //withLoc.value.uid = withLoc.uid
   return withLoc
 }
 // avoid left-recursions
@@ -137,6 +137,8 @@ polymeter = _ '{' _ left:term+ ',' _ right:term+ _ '}' _ {
     type: 'polymeter' 
   }
 
+  addLoc( result.left, location() )
+  addLoc( result.right, location() )
   addLoc( result, location() )
 
   return result
