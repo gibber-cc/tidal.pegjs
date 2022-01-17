@@ -9,6 +9,8 @@ const rnd = function( phase ) {
   return new srand( phase.toFraction() )()
 }
 
+let queryStart;
+
 /* queryArc
  *
  * Generates events for provided pattern, starting at
@@ -22,6 +24,7 @@ const queryArc = function( pattern, phase, duration ) {
         end           = start.add( duration ),
         // get phase offset if scheduling begins in middle of event arc
         adjustedPhase = adjustPhase( phase, getPhaseIncr( pattern ), end )
+  queryStart = phase.clone();
 
   let eventList
 
@@ -334,7 +337,7 @@ const handlers = {
       // initialize, then increment. this assumes that the pattern will be parsed once,
       // and then the resulting data structure will be queried repeatedly, enabling the use
       // of state.
-      group.count = group.count === undefined ? 0 : group.count + 1
+      group.count = group.count === undefined ? queryStart.valueOf() : group.count + 1
 
       const subpattern = group.values[ group.count % group.values.length ]
       const dur = duration.valueOf() <= 1 ? Fraction(1) : duration 
